@@ -1,8 +1,10 @@
 package com.example.launcher.view
 
+import android.content.ContentValues.TAG
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
 import android.os.UserHandle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -50,7 +52,10 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
             // Layout of the apps
             Column(
                 modifier = Modifier
-                    .clickable { viewModel.launchApp(app.packageName) }
+                    .clickable {
+                        viewModel.launchApp(app.packageName)
+                        Log.d(TAG, "HomeScreen: Opening app: " + app.label)
+                    }
                     .padding(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
