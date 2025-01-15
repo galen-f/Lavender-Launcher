@@ -3,20 +3,15 @@ package com.example.launcher.viewmodel
 import android.content.Context
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
-import android.os.UserHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.launcher.AppInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-data class AppInfo(
-    val label: String,
-    val packageName: String
-)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
