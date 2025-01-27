@@ -21,6 +21,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+    // Designate as apps, call from HomeScreen.kt to render them.
     private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
     val apps: StateFlow<List<AppInfo>> = _apps
 
@@ -28,6 +29,7 @@ class HomeViewModel @Inject constructor(
         loadInstalledApps()
     }
 
+    // Get all the installed apps on startup along with all important info, icon, name, etc
     private fun loadInstalledApps() {
         viewModelScope.launch {
             val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
@@ -43,6 +45,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    // Start apps if they get clicked
     fun launchApp(packageName: String) {
         val pm: PackageManager = context.packageManager
         val intent = pm.getLaunchIntentForPackage(packageName)
@@ -51,6 +54,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    // Convert app icon to Bitmap, allows the app icon to be displayed in image in the compose of HomeScreen.kt
     private fun drawableToBitmap(drawable: Drawable): Bitmap {
         if (drawable is BitmapDrawable) {
             return drawable.bitmap
