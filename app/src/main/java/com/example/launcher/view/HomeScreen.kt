@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.BlurEffect
 import android.graphics.Shader
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
@@ -67,7 +68,21 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
             .fillMaxSize(),
         contentPadding = PaddingValues(20.dp) // Padding around the whole grid
     ) {
+        // Title item
+        item(span = { GridItemSpan(2) }) { // Span across 2 columns
+            Text(
+                text = "Apps",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(64.dp), // Padding around the title
+                textAlign = TextAlign.Center,
+                color = Color.Black
+            )
+        }
+
         items(apps) { app ->
+
             // Layout of the apps
             Row(
                 modifier = Modifier
@@ -89,7 +104,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                 // Display app text
                 Text(
                     text = app.label,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.labelLarge,
                     textAlign = TextAlign.Left,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
