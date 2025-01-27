@@ -7,7 +7,6 @@ import com.example.launcher.ui.theme.LauncherTheme
 import com.example.launcher.view.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: add background customization
 // TODO: add app home/drawer
 // TODO: add popular apps
 // TODO: add widgets
