@@ -35,12 +35,17 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
             val userHandle = android.os.Process.myUserHandle()
-            val appList = launcherApps.getActivityList(null, userHandle).map {
-                AppInfo(
-                    label = it.label.toString(),
-                    packageName = it.applicationInfo.packageName,
-                    icon = drawableToBitmap(it.applicationInfo.loadIcon(context.packageManager))
-                )
+            val currentPackageName = context.packageName
+            val appList = launcherApps.getActivityList(null, userHandle).mapNotNull { // Map to AppInfo, ignore Null values (Like this app)
+                if (it.applicationInfo.packageName != currentPackageName) { // Filter out the launcher app
+                    AppInfo(
+                        label = it.label.toString(),
+                        packageName = it.applicationInfo.packageName,
+                        icon = drawableToBitmap(it.applicationInfo.loadIcon(context.packageManager))
+                    )
+                } else {
+                    null // Skip this current app
+                }
             }
             _apps.value = appList.sortedBy { it.label }
         }
