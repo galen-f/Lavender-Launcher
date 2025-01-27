@@ -1,5 +1,6 @@
 package com.example.launcher.viewmodel
 
+import android.app.WallpaperManager
 import android.content.Context
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager

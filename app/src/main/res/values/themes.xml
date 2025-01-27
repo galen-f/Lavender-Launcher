@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.Launcher" parent="Theme.Material3.DayNight.NoActionBar">
 
-    <style name="Theme.Launcher" parent="android:Theme.Material.Light.NoActionBar" />
+        <!-- Custom Theme -->
+        <!-- Shows system wallpaper (Doesn't have to read external storage which is deprecated) -->
+        <item name="android:windowShowWallpaper">true</item>
+
+        <!-- Transparent background, allows the wallpaper to show through -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <!-- allow the app to draw behind the system bars, nav and status-->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+        <!-- Status Bar and navbar made transparent -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+
+
+
+        <!-- Primary Colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryContainer">@color/primaryContainer</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryContainer">@color/secondaryContainer</item>
+    </style>
+
 </resources>

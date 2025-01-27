@@ -7,7 +7,6 @@
     <!-- This is a questionable permission which is only needed
     by launcher apps to read all other apps installed -->
 
-
     <application
         android:name=".LauncherApplication"
         android:allowBackup="true"
@@ -18,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Launcher"
-        tools:targetApi="31">
+        tools:targetApi="34">
         <activity
             android:name=".MainActivity"
             android:exported="true"
