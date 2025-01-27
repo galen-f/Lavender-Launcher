@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,16 +25,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.material3.Button
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.launcher.viewmodel.DrawerViewModel
 
 @Composable
-fun HomeScreen(viewModel: DrawerViewModel = hiltViewModel()) {
+fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltViewModel()) {
     // Get apps list from HomeViewModel
     val apps by viewModel.apps.collectAsState()
 
@@ -43,14 +47,6 @@ fun HomeScreen(viewModel: DrawerViewModel = hiltViewModel()) {
         modifier = Modifier
             .background(
                 color = Color.LightGray.copy(alpha = 1F)) // Can be made transparent.
-//            .graphicsLayer {
-//                // Apply blur effect
-//                BlurEffect(
-//                    radiusX = 10f,
-//                    radiusY = 10f,
-//                    edgeTreatment = TileMode.Mirror
-//                )
-//            }
             .fillMaxSize(),
         contentPadding = PaddingValues(20.dp) // Padding around the whole grid
     ) {
@@ -65,6 +61,17 @@ fun HomeScreen(viewModel: DrawerViewModel = hiltViewModel()) {
                 textAlign = TextAlign.Center,
                 color = Color.Black
             )
+        }
+
+        // Placeholder navigation button
+        item(span = { GridItemSpan(2) }) {
+            // Navigate to AppDrawer
+            Button(
+                onClick = { navController.navigate("homeScreen") },
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                Text(text = "Go to home screen")
+            }
         }
 
         items(apps) { app ->
