@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,7 +30,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.BlurEffect
+import android.graphics.Shader
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,7 +53,18 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
     // Scaffold layout for a basic launcher interface
     LazyVerticalGrid(
         columns = GridCells.Fixed(2), // # items per row
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .background(
+                color = Color.LightGray.copy(alpha = 1F)) // Can be made transparent.
+//            .graphicsLayer {
+//                // Apply blur effect
+//                BlurEffect(
+//                    radiusX = 10f,
+//                    radiusY = 10f,
+//                    edgeTreatment = TileMode.Mirror
+//                )
+//            }
+            .fillMaxSize(),
         contentPadding = PaddingValues(20.dp) // Padding around the whole grid
     ) {
         items(apps) { app ->
