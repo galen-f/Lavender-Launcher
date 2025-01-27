@@ -1,5 +1,8 @@
 package com.example.launcher.view
 
+import android.util.Log
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -8,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -20,6 +24,16 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onHorizontalDrag = { change, dragAmount ->
+                        change.consume()
+                        if (dragAmount > 50F) {
+                            navController.navigate("appDrawer")
+                        }
+                    }
+                )
+            }
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -33,13 +47,13 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // Navigate to AppDrawer
-            Button(
-                onClick = { navController.navigate("appDrawer") },
-                modifier = Modifier.padding(bottom = 16.dp)
-            ) {
-                Text(text = "Go to App Drawer")
-            }
+//            // Navigate to AppDrawer
+//            Button(
+//                onClick = { navController.navigate("appDrawer") },
+//                modifier = Modifier.padding(bottom = 16.dp)
+//            ) {
+//                Text(text = "Go to App Drawer")
+//            }
         }
     }
 }

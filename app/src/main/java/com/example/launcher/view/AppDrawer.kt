@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -47,7 +48,17 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
         modifier = Modifier
             .background(
                 color = Color.LightGray.copy(alpha = 1F)) // Can be made transparent.
-            .fillMaxSize(),
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onHorizontalDrag = { change, dragAmount ->
+                        change.consume()
+                        if (dragAmount < -50F) {
+                            navController.navigate("homeScreen")
+                        }
+                    }
+                )
+            },
         contentPadding = PaddingValues(20.dp) // Padding around the whole grid
     ) {
         // Title item
@@ -61,17 +72,6 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
                 textAlign = TextAlign.Center,
                 color = Color.Black
             )
-        }
-
-        // Placeholder navigation button
-        item(span = { GridItemSpan(2) }) {
-            // Navigate to AppDrawer
-            Button(
-                onClick = { navController.navigate("homeScreen") },
-                modifier = Modifier.padding(bottom = 16.dp)
-            ) {
-                Text(text = "Go to home screen")
-            }
         }
 
         items(apps) { app ->
