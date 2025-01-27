@@ -1,6 +1,5 @@
 package com.example.launcher.viewmodel
 
-import android.app.WallpaperManager
 import android.content.Context
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
@@ -10,7 +9,6 @@ import com.example.launcher.AppInfo
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import androidx.compose.ui.graphics.Canvas
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,10 +17,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class DrawerViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
-    // Designate as apps, call from HomeScreen.kt to render them.
+    // Designate as apps, call from AppDrawer.kt to render them.
     private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
     val apps: StateFlow<List<AppInfo>> = _apps
 
@@ -60,7 +58,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // Convert app icon to Bitmap, allows the app icon to be displayed in image in the compose of HomeScreen.kt
+    // Convert app icon to Bitmap, allows the app icon to be displayed in image in the compose of AppDrawer.kt
     private fun drawableToBitmap(drawable: Drawable): Bitmap {
         if (drawable is BitmapDrawable) {
             return drawable.bitmap
