@@ -47,13 +47,13 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
         columns = GridCells.Fixed(2), // # items per row
         modifier = Modifier
             .background(
-                color = Color.LightGray.copy(alpha = 1F)) // Can be made transparent.
+                color = Color.LightGray.copy(alpha = 0.8F)) // BG color and transparency value.
             .fillMaxSize()
-            .pointerInput(Unit) {
+            .pointerInput(Unit) { // Gesture Based Navigation
                 detectHorizontalDragGestures(
                     onHorizontalDrag = { change, dragAmount ->
                         change.consume()
-                        if (dragAmount < -50F) {
+                        if (dragAmount < -50F) { // Prevent accidental swipes with this value
                             navController.navigate("homeScreen")
                         }
                     }

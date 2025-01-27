@@ -24,11 +24,11 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .pointerInput(Unit) {
+            .pointerInput(Unit) { // Gesture based navigation
                 detectHorizontalDragGestures(
                     onHorizontalDrag = { change, dragAmount ->
                         change.consume()
-                        if (dragAmount > 50F) {
+                        if (dragAmount > 50F) { // Prevent accidental swipes with this value
                             navController.navigate("appDrawer")
                         }
                     }
