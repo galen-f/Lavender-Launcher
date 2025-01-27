@@ -44,35 +44,35 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
 
     // Scaffold layout for a basic launcher interface
     LazyVerticalGrid(
-        columns = GridCells.Fixed(4), // # items per row
+        columns = GridCells.Fixed(2), // # items per row
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp) // Padding around the whole grid
+        contentPadding = PaddingValues(20.dp) // Padding around the whole grid
     ) {
         items(apps) { app ->
             // Layout of the apps
-            Column(
+            Row(
                 modifier = Modifier
                     .clickable {
                         viewModel.launchApp(app.packageName)
                         Log.d(TAG, "HomeScreen: Opening app: " + app.label)
                     }
-                    .padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(20.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 // Display app icon
                 Image(
                     painter = remember { BitmapPainter(app.icon.asImageBitmap()) },
                     contentDescription = "${app.label} icon",
                     modifier = Modifier
-                        .size(64.dp) // Icon Size
-                        .padding(end = 8.dp) // Space between icon and text
+                        .size(50.dp) // Icon Size
+                        .padding(end = 12.dp) // Space between icon and text
                 )
                 // Display app text
                 Text(
                     text = app.label,
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center,
-                    maxLines = 1,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Left,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
