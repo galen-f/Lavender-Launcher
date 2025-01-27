@@ -20,7 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.launcher.viewmodel.DrawerViewModel
 
 
-// TODO: add app home/drawer
+// TODO: App Drawer / Home created as fragments
 // TODO: add popular apps
 // TODO: add widgets
 // TODO: add folders
