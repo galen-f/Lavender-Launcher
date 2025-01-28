@@ -19,14 +19,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.launcher.viewmodel.DrawerViewModel
 
-
-// TODO: App Drawer / Home created as fragments
-// TODO: add popular apps
 // TODO: add widgets
 // TODO: add folders
+// TODO: add app dock
 // TODO: add screen-time watcher
 // TODO: add screen-time features
 // TODO: add custom settings system
+// TODO: Cache installed apps and their data using room?
 
 @AndroidEntryPoint // HILT
 class MainActivity : ComponentActivity() {
