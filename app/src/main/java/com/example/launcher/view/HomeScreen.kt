@@ -46,14 +46,6 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
-
-//            // Navigate to AppDrawer
-//            Button(
-//                onClick = { navController.navigate("appDrawer") },
-//                modifier = Modifier.padding(bottom = 16.dp)
-//            ) {
-//                Text(text = "Go to App Drawer")
-//            }
         }
     }
 }
