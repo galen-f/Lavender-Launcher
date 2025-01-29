@@ -39,7 +39,7 @@ import com.example.launcher.viewmodel.DrawerViewModel
 
 @Composable
 fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltViewModel()) {
-    // Get apps list from HomeViewModel
+    // Get apps list from DrawerViewModel
     val apps by viewModel.apps.collectAsState()
 
     // Scaffold layout for a basic launcher interface
