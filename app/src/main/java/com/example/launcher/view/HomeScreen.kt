@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.input.ImeAction
@@ -39,7 +41,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-                detectHorizontalDragGestures { change, dragAmount ->
+                detectHorizontalDragGestures { change, dragAmount -> // Gesture Based Navigation (Swipe right to go to app drawer)
                     change.consume()
                     if (dragAmount > 50F) {
                         navController.navigate("appDrawer")
@@ -56,13 +58,16 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             folders.forEach { folder ->
-                Text(
+                Text( // Style of folders
                     text = folder,
                     style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.LightGray.copy(alpha = 0.8F))
+                        .padding(8.dp)
                 )
             }
         }
@@ -74,10 +79,10 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
-                .padding(16.dp)
+                .background(Color.White.copy(alpha = 0.0F))
+                .padding(16.dp),
         ) {
-            BasicTextField(
+            BasicTextField( // Folder creation input
                 value = newFolderName,
                 onValueChange = { newFolderName = it },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
@@ -89,10 +94,11 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                     }
                 }),
                 modifier = Modifier
-                    .background(Color.LightGray)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.LightGray.copy(alpha = 0.6F))
                     .padding(8.dp)
             )
-            Button(onClick = {
+            Button(onClick = { // Folder creation button
                 if (newFolderName.isNotBlank()) {
                     viewModel.addFolder(newFolderName)
                     newFolderName = ""

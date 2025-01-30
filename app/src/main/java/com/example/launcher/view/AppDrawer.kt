@@ -42,7 +42,7 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
     // Get apps list from DrawerViewModel
     val apps by viewModel.apps.collectAsState()
 
-    // Scaffold layout for a basic launcher interface
+    // Layout for basic drawer interface
     LazyVerticalGrid(
         columns = GridCells.Fixed(2), // # items per row
         modifier = Modifier
