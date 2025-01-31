@@ -46,12 +46,23 @@ class HomeViewModel @Inject constructor( private val folderDao: FolderDao ) : Vi
             if (folder != null) {
                 folderDao.insertAppIntoFolder(AppFolderEntity(folderId = folder.id, packageName = packageName))
                 Log.d("HomeViewModel", "App added to folder: \n Folder: $folderName,\n Package: $packageName,\n Folder ID: ${folder.id}")
+            } else {
+                Log.d("HomeViewModel", "Folder not found: $folderName")
             }
         }
     }
 
     fun displayAppsInFolder(folderName: String) {
-        Log.d("HomeViewModel", "Displaying apps in folder: $folderName")
+        viewModelScope.launch {
+            val folder = folderDao.getFolderByName(folderName)
+            if (folder != null) {
+                val apps = folderDao.getAppsInFolder(folder.id)
+                Log.d("HomeViewModel", "Apps in folder with folder $folderName")
+            } else {
+                Log.d("HomeViewModel", "Folder not found: $folderName")
+            }
+
+        }
     }
 
 }

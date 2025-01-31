@@ -2,6 +2,7 @@ package com.example.launcher.view
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -68,12 +69,13 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.LightGray.copy(alpha = 0.8F))
                         .padding(8.dp)
+                        .clickable{ viewModel.displayAppsInFolder(folder) }
                 )
             }
         }
     }
 
-    if (showInputDialog) {
+    if (showInputDialog) { // If user wants to create a new folder
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,

@@ -17,6 +17,9 @@ interface FolderDao {
     @Query("SELECT * FROM folders WHERE name = :name LIMIT 1")
     suspend fun getFolderByName(name: String): FolderEntity?
 
+    @Query("SELECT * FROM app_folders WHERE folderId = :folderId")
+    fun getAppsInFolder(folderId: Int): Flow<List<AppFolderEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAppIntoFolder(appFolder: AppFolderEntity)
 }
