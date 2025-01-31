@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [FolderEntity::class], version = 1)
+@Database(entities = [FolderEntity::class , AppFolderEntity::class], version = 2)
 abstract class FolderDatabase : RoomDatabase() {
     abstract fun folderDao(): FolderDao
 
@@ -18,7 +18,8 @@ abstract class FolderDatabase : RoomDatabase() {
                     context.applicationContext,
                     FolderDatabase::class.java,
                     "launcher_database"
-                ).build()
+                ).fallbackToDestructiveMigration()
+                    .build()
                 instance = newInstance
                 newInstance
             }
