@@ -37,6 +37,10 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
     val folders = viewModel.folders.collectAsState().value
     var showInputDialog by remember { mutableStateOf(false) }
     var newFolderName by remember { mutableStateOf("") }
+    val appsInFolder by viewModel.appsInFolder.collectAsState()
+
+    // TODO: Allow multiple folders to be open together
+    var expandedFolder by remember { mutableStateOf<String?>(null) } // Track which folder is expanded
 
     Box(
         modifier = Modifier
@@ -62,19 +66,52 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             folders.forEach { folder ->
-                Text( // Style of folders
-                    text = folder,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray.copy(alpha = 0.8F))
-                        .padding(8.dp)
-                        .clickable{ viewModel.displayAppsInFolder(folder) }
-                )
+                Column {
+                    // TODO: make this less ugly
+                    // folder
+                    Text(
+                        text = folder,
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.LightGray.copy(alpha = 0.8F))
+                            .padding(8.dp)
+                            .clickable {
+                                if (expandedFolder == folder) {
+                                    expandedFolder = null // Collapse if already open
+                                } else {
+                                    expandedFolder = folder // Expand the clicked folder
+                                    viewModel.displayAppsInFolder(folder)
+                                }
+                            }
+                    )
+
+                    // TODO: Display apps as app icons and horizontally
+                    // display apps when folder is expanded
+                    if (expandedFolder == folder) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.White.copy(alpha = 0.9F))
+                                .padding(8.dp)
+                        ) {
+                            appsInFolder.forEach { packageName ->
+                                Text(
+                                    text = packageName,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .clickable { viewModel.launchApp(packageName) } // Launch app on click
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
+    // TODO: make this less ugly
     if (showInputDialog) { // If user wants to create a new folder
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -111,4 +148,6 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
             }
         }
     }
+
+    // TODO: add app dock
 }

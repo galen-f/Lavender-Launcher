@@ -126,6 +126,9 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth()
                 )
+                // TODO: Make this a custom menu
+                // TODO: enable drag and drop to folders
+                // TODO: Allow user to add 4-5 apps to the app dock
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }
