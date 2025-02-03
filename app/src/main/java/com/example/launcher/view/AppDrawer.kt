@@ -69,7 +69,10 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
                     }
                 )
             },
-        contentPadding = PaddingValues(20.dp) // Padding around the whole grid
+        contentPadding = PaddingValues(
+            25.dp,
+            bottom = 64.dp // extra padding for the navbar
+        ) // Padding around the whole grid
     ) {
         // Title item
         item(span = { GridItemSpan(2) }) { // Span across 2 columns
@@ -86,63 +89,66 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
 
         items(apps) { app ->
             var showMenu by remember { mutableStateOf(false) }
-//
-//            // Layout of the apps
-//            Row(
-//                modifier = Modifier
-//                    .clickable {
-//                        viewModel.launchApp(app.packageName)
-//                        Log.d(TAG, "HomeScreen: Opening app: " + app.label)
-//                    }
-//                    .padding(20.dp),
-//                verticalAlignment = Alignment.CenterVertically
-//            )
+
             Box(
                 modifier = Modifier
-                    .padding(8.dp)
-                    .size(64.dp)
-                    .background(Color.Gray, shape = CircleShape)
+                    .padding(0.dp) // Padding between app "boxes"
+                    .size(80.dp)
                     .clickable { viewModel.launchApp(app.packageName) }
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onLongPress = { showMenu = true }
                         )
                     }
-            ) {
-                // Display app icon
-                Image(
-                    painter = remember { BitmapPainter(app.icon.asImageBitmap()) },
-                    contentDescription = "${app.label} icon",
+            ) { Row(
                     modifier = Modifier
-                        .size(50.dp) // Icon Size
-                        .padding(end = 12.dp) // Space between icon and text
+                        .clickable {
+                            viewModel.launchApp(app.packageName)
+                            Log.d(TAG, "HomeScreen: Opening app: " + app.label)
+                        }
+                        .padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 )
-                // Display app text
-                Text(
-                    text = app.label,
-                    style = MaterialTheme.typography.labelLarge,
-                    textAlign = TextAlign.Left,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                // TODO: Make this a custom menu
-                // TODO: enable drag and drop to folders
-                // TODO: Allow user to add 4-5 apps to the app dock
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
-                ) {
-                    folders.forEach { folder ->
-                        DropdownMenuItem(
-                            text = { Text(folder) },
-                            onClick = {
-                                viewModel2.addAppToFolder(app.packageName, folder)
-                                showMenu = false
-                            }
-                        )
+                {
+                    // Display app icon
+                    Image(
+                        painter = remember { BitmapPainter(app.icon.asImageBitmap()) },
+                        contentDescription = "${app.label} icon",
+                        modifier = Modifier
+                            .size(50.dp) // Icon Size
+                            .padding(end = 12.dp) // Space between icon and text
+                    )
+                    // Display app text
+                    Text(
+                        text = app.label,
+                        style = MaterialTheme.typography.labelLarge,
+                        textAlign = TextAlign.Left,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    // TODO: Make this a custom menu
+                    // TODO: enable drag and drop to folders
+                    // TODO: Allow user to add 4-5 apps to the app dock
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        folders.forEach { folder ->
+                            DropdownMenuItem(
+                                text = { Text(folder) },
+                                onClick = {
+                                    viewModel2.addAppToFolder(
+                                        app.packageName,
+                                        folder
+                                    ) // Borrowed method from homeViewModel to make sure the folders are handled by home entirely
+                                    showMenu = false
+                                }
+                            )
+                        }
                     }
                 }
+
             }
         }
     }
