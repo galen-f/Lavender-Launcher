@@ -56,7 +56,7 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
         columns = GridCells.Fixed(2), // # items per row
         modifier = Modifier
             .background(
-                color = Color.LightGray.copy(alpha = 0.8F)
+                color = Color.DarkGray.copy(alpha = 0.8F)
             ) // BG color and transparency value.
             .fillMaxSize()
             .pointerInput(Unit) { // Gesture Based Navigation
@@ -83,7 +83,7 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
                     .fillMaxWidth()
                     .padding(64.dp), // Padding around the title
                 textAlign = TextAlign.Center,
-                color = Color.Black
+                color = Color.White
             )
         }
 
@@ -125,7 +125,8 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
                         textAlign = TextAlign.Left,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        color = Color.White
                     )
                     // TODO: Make this a custom menu
                     // TODO: enable drag and drop to folders
