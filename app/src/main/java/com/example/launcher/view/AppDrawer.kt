@@ -88,6 +88,7 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
             )
         }
 
+        // TODO: this section is massive, explore making it a composable function
         items(apps) { app ->
             var showMenu by remember { mutableStateOf(false) }
 

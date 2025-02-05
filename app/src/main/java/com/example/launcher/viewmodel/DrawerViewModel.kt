@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// TODO: there is a lot of data management in this file, should be refactored
+
 @HiltViewModel
 class DrawerViewModel @Inject constructor(
     private val appDao: AppDao,
@@ -42,6 +44,7 @@ class DrawerViewModel @Inject constructor(
     }
 
     private fun fetchInstalledApps() {
+        // TODO: this function needs a lot of work I hate it, maybe could be split into two, retrieveApps and storeApps
         viewModelScope.launch {
             val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
             val userHandle = android.os.Process.myUserHandle()
