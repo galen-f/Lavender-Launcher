@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.launcher.utils.BitmapConverter
 import com.example.launcher.viewmodel.DrawerViewModel
 import com.example.launcher.viewmodel.HomeViewModel
 
@@ -90,6 +91,10 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
         items(apps) { app ->
             var showMenu by remember { mutableStateOf(false) }
 
+            val bitmap = remember(app.icon) {
+                BitmapConverter.toBitmap(app.icon)
+            }
+
             Box(
                 modifier = Modifier
                     .padding(0.dp) // Padding between app "boxes"
@@ -111,13 +116,15 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
                 )
                 {
                     // Display app icon
+                if (bitmap != null) { // safety null check for painter statement
                     Image(
-                        painter = remember { BitmapPainter(app.icon.asImageBitmap()) },
+                        painter = remember { BitmapPainter(bitmap.asImageBitmap()) },
                         contentDescription = "${app.label} icon",
                         modifier = Modifier
                             .size(50.dp) // Icon Size
                             .padding(end = 12.dp) // Space between icon and text
                     )
+                }
                     // Display app text
                     Text(
                         text = app.label,

@@ -2,6 +2,8 @@ package com.example.launcher.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.launcher.model.AppDao
+import com.example.launcher.model.AppDatabase
 import com.example.launcher.model.FolderDao
 import com.example.launcher.model.FolderDatabase
 import dagger.Module
@@ -17,7 +19,7 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): FolderDatabase {
+    fun provideFolderDatabase(@ApplicationContext context: Context): FolderDatabase {
         return Room.databaseBuilder(
             context.applicationContext,
             FolderDatabase::class.java,
@@ -28,5 +30,20 @@ object DatabaseModule {
     @Provides
     fun provideFolderDao(database: FolderDatabase): FolderDao {
         return database.folderDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context.applicationContext,
+            AppDatabase::class.java,
+            "app_database"
+        ).build()
+    }
+
+    @Provides
+    fun provideAppDao(appDatabase: AppDatabase): AppDao {
+        return appDatabase.appDao()
     }
 }
