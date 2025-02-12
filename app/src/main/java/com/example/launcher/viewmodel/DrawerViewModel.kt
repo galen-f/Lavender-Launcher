@@ -52,15 +52,11 @@ class DrawerViewModel @Inject constructor(
 
             val installedApps = launcherApps.getActivityList(null, userHandle).mapNotNull {
                 if (it.applicationInfo.packageName != currentPackageName) {
-                     // TODO: Why are we doing this??
-                    val iconDrawable = it.applicationInfo.loadIcon(context.packageManager)
-                    val iconBitmap = drawableToBitmap(iconDrawable)
-                    val iconByteArray = BitmapConverter.fromBitmap(iconBitmap) // Convert to ByteArray
+
 
                     AppInfo(
                         label = it.label.toString(),
                         packageName = it.applicationInfo.packageName,
-                        icon = iconByteArray // Can fetch icon separately
                     )
                 } else {
                     null

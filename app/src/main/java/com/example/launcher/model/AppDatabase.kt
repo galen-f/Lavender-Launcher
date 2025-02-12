@@ -5,7 +5,7 @@ import androidx.room.*
 import com.example.launcher.utils.BitmapConverter
 import com.example.launcher.utils.IntListConverter
 
-@Database(entities = [AppInfo::class], version = 1)
+@Database(entities = [AppInfo::class], version = 2)
 @TypeConverters(BitmapConverter::class, IntListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun appDao(): AppDao
