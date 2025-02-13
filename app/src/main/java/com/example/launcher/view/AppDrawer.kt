@@ -1,15 +1,17 @@
 package com.example.launcher.view
 
 import android.content.ContentValues.TAG
-import android.util.Log
 import android.content.Context
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +49,7 @@ import androidx.navigation.NavController
 import com.example.launcher.utils.AppIconUtils.getAppIconBitmap
 import com.example.launcher.viewmodel.DrawerViewModel
 import com.example.launcher.viewmodel.HomeViewModel
+import com.google.accompanist.drawablepainter.DrawablePainter
 
 @Composable
 fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltViewModel(), viewModel2: HomeViewModel = hiltViewModel()) {
@@ -52,13 +57,14 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
     val apps by viewModel.apps.collectAsState()
     val folders by viewModel2.folders.collectAsState()
     val context = LocalContext.current
+    val packageManager = context.packageManager
 
     // Layout for basic drawer interface
     LazyVerticalGrid(
         columns = GridCells.Fixed(2), // # items per row
         modifier = Modifier
             .background(
-                color = Color.DarkGray.copy(alpha = 0.8F)
+                color = Color.LightGray.copy(alpha = 0.8F)
             ) // BG color and transparency value.
             .fillMaxSize()
             .pointerInput(Unit) { // Gesture Based Navigation
@@ -71,10 +77,7 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
                     }
                 )
             },
-        contentPadding = PaddingValues(
-            25.dp,
-            bottom = 64.dp // extra padding for the navbar
-        ) // Padding around the whole grid
+        contentPadding = PaddingValues(20.dp) // Padding around the whole grid
     ) {
         // Title item
         item(span = { GridItemSpan(2) }) { // Span across 2 columns
@@ -85,35 +88,53 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
                     .fillMaxWidth()
                     .padding(64.dp), // Padding around the title
                 textAlign = TextAlign.Center,
-                color = Color.White
+                color = Color.Black
             )
         }
 
-        // TODO: this section is massive, explore making it a composable function
-        items(apps, key = { it.packageName }) { app -> // Reused recomposition, unique ID so the systems doesn't mix up which icon goes with which app.
+        items(apps) { app ->
             var showMenu by remember { mutableStateOf(false) }
-
-            AppIconWithLabel(context, app.packageName, app.label) { // Spawn composable, spawns app icons
-                viewModel.launchApp(app.packageName)
-                Log.d("Outside Box", "HomeScreen: Opening app: " + app.label)
-            }
+            val icon: Drawable = packageManager.getApplicationIcon(app.packageName)
 
             Box(
                 modifier = Modifier
-                    .padding(0.dp) // Padding between app "boxes"
-                    .size(70.dp)
-                    .clickable {
-                        Log.d("Inside Box", "HomeScreen: Opening app: " + app.label)
-                        viewModel.launchApp(app.packageName) }
+                    .padding(8.dp)
+                    .size(64.dp)
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onLongPress = { showMenu = true }
                         )
                     }
             ) {
-                    // TODO: Make this a custom menu
-                    // TODO: enable drag and drop to folders
-                    // TODO: Allow user to add 4-5 apps to the app dock
+                Row( // Responsible for the organization inside the box
+                    modifier = Modifier
+                        .clickable {
+                            viewModel.launchApp(app.packageName)
+                            Log.d(TAG, "HomeScreen: Opening app: " + app.label)
+                        }
+                        .padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                )
+                {
+                    // Display app icon
+                    Image(
+                        painter = DrawablePainter(icon), // This is the use of the accompanist library, which is shit, just an fyi, took my almost two days to get working
+                        contentDescription = "${app.label} icon",
+                        modifier = Modifier
+                            .size(50.dp) // Icon Size
+                            .padding(end = 12.dp) // Space between icon and text
+                    )
+
+                    // Display app text
+                    Text(
+                        text = app.label,
+                        style = MaterialTheme.typography.labelLarge,
+                        textAlign = TextAlign.Left,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
                     DropdownMenu(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
@@ -122,10 +143,7 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
                             DropdownMenuItem(
                                 text = { Text(folder) },
                                 onClick = {
-                                    viewModel2.addAppToFolder(
-                                        app.packageName,
-                                        folder
-                                    ) // Borrowed method from homeViewModel to make sure the folders are handled by home entirely
+                                    viewModel2.addAppToFolder(app.packageName, folder)
                                     showMenu = false
                                 }
                             )
@@ -135,49 +153,4 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
             }
         }
     }
-
-// Storing the app icon in the database of installed apps is massively inefficient.
-// These composables use the launcher library from google to get the app icon for each app at runtime.
-@Composable
-fun AppIconWithLabel(context: Context, packageName: String, label: String, onClick: () -> Unit) {
-    Log.d("AppIconWithLabel", "Running AppIconWithLabel: $label")
-    val packageManager = context.packageManager
-
-    // Remember keeps the system from redoing all of this every time it gets displayed. Takes a good 5 seconds to load the page first time so this is important
-    val iconBitmap by remember {
-        mutableStateOf(getAppIconBitmap(packageManager, packageName))
-    }
-
-    // Layout of the app "boxes" (icons and names, clickable)
-    Row( // App box
-        modifier = Modifier
-//            .clickable {
-//                Log.d("Inside Composable", "HomeScreen: Opening app: " + label)
-//                onClick()
-//            }
-            .padding(20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        iconBitmap?.let {
-            // App icon (as bitmap)
-            Image(
-                painter = BitmapPainter(it.asImageBitmap()),
-                contentDescription = "$label icon",
-                modifier = Modifier
-                    .size(50.dp) // actual size of the icon
-                    .padding(end = 12.dp) // Space between icon and text
-            )
-        }
-        // Displayed name of the app
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelLarge,
-            textAlign = TextAlign.Left,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.fillMaxWidth(),
-            color = Color.White
-        )
-    }
 }
-

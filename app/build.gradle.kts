@@ -79,6 +79,7 @@ dependencies {
     implementation (libs.ui)
     implementation (libs.material3)
     implementation (libs.androidx.runtime.livedata)
+    implementation(libs.accompanist.drawablepainter)
 }
 
 kapt {

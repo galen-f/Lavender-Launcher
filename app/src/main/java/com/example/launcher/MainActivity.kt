@@ -1,11 +1,14 @@
 package com.example.launcher
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.launcher.ui.theme.LauncherTheme
 import com.example.launcher.view.AppDrawer
 import com.example.launcher.view.HomeScreen
@@ -32,24 +35,24 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val navController = rememberNavController()
             LauncherTheme {
-                LauncherNavHost()
+                LauncherNavHost(navController)
             }
         }
     }
 }
 
 @Composable
-fun LauncherNavHost() {
-    val navController = rememberNavController()
+fun LauncherNavHost(navController: NavHostController) {
 
     NavHost(navController = navController, startDestination = "HomeScreen") {
-        composable("appDrawer") {
+        composable("appDrawer", arguments = emptyList()) {
             // HILT Injection
             val viewModel: DrawerViewModel = hiltViewModel()
             AppDrawer(viewModel = viewModel, navController = navController)
         }
-        composable("homeScreen") {
+        composable("homeScreen", arguments = emptyList()) {
             // HILT Injection
             val viewModel: HomeViewModel = hiltViewModel()
             HomeScreen(viewModel = viewModel, navController = navController)
