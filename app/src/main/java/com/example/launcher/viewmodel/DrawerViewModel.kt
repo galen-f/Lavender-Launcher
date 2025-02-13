@@ -6,11 +6,10 @@ import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.launcher.model.AppDao
-import com.example.launcher.model.AppInfo
+import com.example.launcher.model.AppEntity
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import com.example.launcher.utils.BitmapConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,8 +26,8 @@ class DrawerViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
     // Designate as apps, call from AppDrawer.kt to render them.
-    private val _apps = MutableStateFlow<List<AppInfo>>(emptyList())
-    val apps: StateFlow<List<AppInfo>> = _apps
+    private val _apps = MutableStateFlow<List<AppEntity>>(emptyList())
+    val apps: StateFlow<List<AppEntity>> = _apps
 
     init {
         loadAppsFromDatabase()
@@ -54,7 +53,7 @@ class DrawerViewModel @Inject constructor(
                 if (it.applicationInfo.packageName != currentPackageName) {
 
 
-                    AppInfo(
+                    AppEntity(
                         label = it.label.toString(),
                         packageName = it.applicationInfo.packageName,
                     )

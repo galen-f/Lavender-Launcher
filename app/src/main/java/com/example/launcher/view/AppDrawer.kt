@@ -112,7 +112,12 @@ fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltVie
                             viewModel.launchApp(app.packageName)
                             Log.d(TAG, "HomeScreen: Opening app: " + app.label)
                         }
-                        .padding(20.dp),
+                        .padding(20.dp)
+                        .pointerInput(Unit) {
+                        detectTapGestures(
+                            onLongPress = { showMenu = true }
+                        )
+                        },
                     verticalAlignment = Alignment.CenterVertically
                 )
                 {

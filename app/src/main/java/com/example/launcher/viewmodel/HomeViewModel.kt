@@ -5,8 +5,8 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.launcher.model.AppDao
 import com.example.launcher.model.AppFolderEntity
-import com.example.launcher.model.FolderDao
 import com.example.launcher.model.FolderEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val folderDao: FolderDao ,
+    private val appDao: AppDao,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -38,7 +38,7 @@ class HomeViewModel @Inject constructor(
 
     private fun loadFolders() {
         viewModelScope.launch {
-            folderDao.getAllFolders().collect { folderEntities ->
+            appDao.getAllFolders().collect { folderEntities ->
                 _folders.value = folderEntities.map { it.name }
             }
         }
@@ -47,7 +47,7 @@ class HomeViewModel @Inject constructor(
     // TODO: Refuse to add duplicate folders
     fun addFolder(folderName: String) {
         viewModelScope.launch {
-            folderDao.insertFolder(FolderEntity(name = folderName))
+            appDao.insertFolder(FolderEntity(name = folderName))
             loadFolders()
         }
     }
@@ -55,9 +55,9 @@ class HomeViewModel @Inject constructor(
     // TODO: Refuse to add duplicate apps
     fun addAppToFolder(packageName: String, folderName: String) {
         viewModelScope.launch {
-            val folder = folderDao.getFolderByName(folderName)
+            val folder = appDao.getFolderByName(folderName)
             if (folder != null) {
-                folderDao.insertAppIntoFolder(
+                appDao.insertAppIntoFolder(
                     AppFolderEntity(
                         folderId = folder.id,
                         packageName = packageName
@@ -75,9 +75,9 @@ class HomeViewModel @Inject constructor(
 
     fun displayAppsInFolder(folderName: String) {
         viewModelScope.launch {
-            val folder = folderDao.getFolderByName(folderName)
+            val folder = appDao.getFolderByName(folderName)
             if (folder != null) {
-                folderDao.getAppsInFolder(folder.id).collect { appEntities ->
+                appDao.getAppsInFolder(folder.id).collect { appEntities ->
                     _appsInFolder.value = appEntities.map { it.packageName }
                     Log.d("HomeViewModel", "Apps in folder with folder $folderName")
                 }

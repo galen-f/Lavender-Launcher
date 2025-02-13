@@ -2,11 +2,10 @@ package com.example.launcher.model
 
 import android.content.Context
 import androidx.room.*
-import com.example.launcher.utils.BitmapConverter
 import com.example.launcher.utils.IntListConverter
 
-@Database(entities = [AppInfo::class], version = 2)
-@TypeConverters(BitmapConverter::class, IntListConverter::class)
+@Database(entities = [AppEntity::class, FolderEntity::class, AppFolderEntity::class], version = 3)
+@TypeConverters(IntListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun appDao(): AppDao
 
