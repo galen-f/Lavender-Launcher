@@ -17,9 +17,6 @@ interface AppDao {
     @Query("DELETE FROM apps WHERE packageName = :packageName")
     suspend fun deleteApp(packageName: String)
 
-    @Query("UPDATE apps SET folderIds = :folderIds WHERE packageName = :packageName")
-    suspend fun updateAppFolders(packageName: String, folderIds: List<Int>)
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFolder(folder: FolderEntity)
 
@@ -29,9 +26,22 @@ interface AppDao {
     @Query("SELECT * FROM folders WHERE name = :name LIMIT 1")
     suspend fun getFolderByName(name: String): FolderEntity?
 
-    @Query("SELECT * FROM app_folders WHERE folderId = :folderId")
-    fun getAppsInFolder(folderId: Int): Flow<List<AppFolderEntity>>
+    @Query("""
+    SELECT apps.* FROM apps
+    INNER JOIN app_folders ON apps.packageName = app_folders.packageName
+    WHERE app_folders.folderId = :folderId
+""")
+    fun getAppsInFolder(folderId: Int): Flow<List<AppEntity>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Query("DELETE FROM app_folders WHERE packageName = :packageName AND folderId = :folderId")
+    suspend fun removeAppFromFolder(packageName: String, folderId: Int)
+
+    @Query("DELETE FROM folders WHERE id = :folderId") // Call delete folder and delete folder apps together
+    suspend fun deleteFolder(folderId: Int)
+
+    @Query("DELETE FROM app_folders WHERE folderId = :folderId")
+    suspend fun deleteFolderApps(folderId: Int)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE) // Change to ignore to prevent duplicate apps?
     suspend fun insertAppIntoFolder(appFolder: AppFolderEntity)
 }

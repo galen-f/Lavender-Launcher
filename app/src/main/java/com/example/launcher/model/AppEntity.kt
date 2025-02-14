@@ -1,24 +1,32 @@
 package com.example.launcher.model
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "apps")
-data class AppEntity(
-    @PrimaryKey val packageName: String,
-    val label: String,
-    val folderIds: List<Int> = emptyList()
+data class AppEntity(                       // Does not include app icon as this is performance deficient
+    @PrimaryKey val packageName: String,    // Technical app name (used to launch the app)
+    val label: String,                      // Humane readable app name (Used to display the app)
 )
 
 @Entity(tableName = "folders")
 data class FolderEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val name: String
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,   // Unique ID for the folders
+    val name: String                                    // Folder name (User generated, not necessarily unique, used for display)
 )
 
-@Entity(tableName = "app_folders")
+@Entity( //Junction table
+    tableName = "app_folders",
+    primaryKeys = ["packageName", "folderId"],
+    foreignKeys = [
+        ForeignKey(entity = AppEntity::class, parentColumns = ["packageName"], childColumns = ["packageName"], onDelete = ForeignKey.CASCADE),
+        ForeignKey(entity = FolderEntity::class, parentColumns = ["id"], childColumns = ["folderId"], onDelete = ForeignKey.CASCADE),
+    ],
+    indices = [Index(value = ["folderId"]), Index(value = ["packageName"])]
+)
 data class AppFolderEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val folderId: Int,
-    val packageName: String
+    val folderId: Int,          // FK to folderEntity
+    val packageName: String     // FK to AppEntity
 )

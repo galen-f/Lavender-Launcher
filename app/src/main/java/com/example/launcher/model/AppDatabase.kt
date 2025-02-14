@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.*
 import com.example.launcher.utils.IntListConverter
 
-@Database(entities = [AppEntity::class, FolderEntity::class, AppFolderEntity::class], version = 3)
+@Database(entities = [AppEntity::class, FolderEntity::class, AppFolderEntity::class], version = 4)
 @TypeConverters(IntListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun appDao(): AppDao
