@@ -75,22 +75,4 @@ class DrawerViewModel @Inject constructor(
         }
     }
 
-    // TODO: May be unnecessary
-    // Convert app icon to Bitmap, allows the app icon to be displayed in image in the compose of AppDrawer.kt
-    private fun drawableToBitmap(drawable: Drawable): Bitmap {
-        if (drawable is BitmapDrawable) {
-            return drawable.bitmap
-        }
-
-        val bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth.takeIf { it > 0 } ?: 1,
-            drawable.intrinsicHeight.takeIf { it > 0 } ?: 1,
-            Bitmap.Config.ARGB_8888
-        )
-        val canvas = android.graphics.Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-        return bitmap
-    }
-
 }
