@@ -5,9 +5,11 @@ import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -51,6 +53,7 @@ import com.example.launcher.viewmodel.DrawerViewModel
 import com.example.launcher.viewmodel.HomeViewModel
 import com.google.accompanist.drawablepainter.DrawablePainter
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppDrawer(
     navController: NavController,
@@ -105,24 +108,14 @@ fun AppDrawer(
                 modifier = Modifier
                     .padding(8.dp)
                     .size(64.dp)
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onLongPress = { showMenu = true }
-                        )
-                    }
             ) {
                 Row( // Responsible for the organization inside the box
                     modifier = Modifier
-                        .clickable {
-                            viewModel.launchApp(app.packageName)
-                            Log.d(TAG, "HomeScreen: Opening app: " + app.label)
-                        }
-                        .padding(20.dp)
-                        .pointerInput(Unit) {
-                        detectTapGestures(
-                            onLongPress = { showMenu = true }
+                        .combinedClickable (
+                            onClick = { viewModel.launchApp(app.packageName) },
+                            onLongClick = { showMenu = true }
                         )
-                        },
+                        .padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 )
                 {
