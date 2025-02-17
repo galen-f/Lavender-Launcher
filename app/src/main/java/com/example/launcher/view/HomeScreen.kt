@@ -16,6 +16,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -60,7 +63,7 @@ fun HomeScreen(
     // TODO: Allow multiple folders to be open together
     var expandedFolder by remember { mutableStateOf<String?>(null) } // Track which folder is expanded
 
-    Box(
+    Box( // Screen box
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
@@ -79,9 +82,9 @@ fun HomeScreen(
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Column( // Screen Column
+        Column( // Screen Column (Folders + dock)
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp) // Space between screen items (Folders and docks)
         ) {
             folders.forEach { folder ->
 
@@ -167,7 +170,18 @@ fun HomeScreen(
                     }
                 }
             }
+
         }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .windowInsetsPadding(WindowInsets.navigationBars) // Keep the dock above the gesturebar
+        ) {
+
+            AppDock(viewModel)
+        }
+
     }
 
     // TODO: make this less ugly

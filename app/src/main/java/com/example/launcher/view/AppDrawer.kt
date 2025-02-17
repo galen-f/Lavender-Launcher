@@ -141,6 +141,13 @@ fun AppDrawer(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
+                        DropdownMenuItem(
+                            text = { Text("Dock")},
+                            onClick = {
+                                viewModel2.addToDock(app.packageName)
+                                showMenu = false
+                            }
+                        )
                         folders.forEach { folder ->
                             DropdownMenuItem(
                                 text = { Text(folder) },

@@ -30,14 +30,26 @@ class HomeViewModel @Inject constructor(
     private val _appsInFolder = MutableStateFlow<List<AppEntity>>(emptyList())
     val appsInFolder: StateFlow<List<AppEntity>> = _appsInFolder
 
+    private val _dockApps = MutableStateFlow<List<AppEntity>>(emptyList())
+    val dockApps: StateFlow<List<AppEntity>> = _dockApps
+
     init {
         loadFolders()
+        loadDockApps()
     }
 
     private fun loadFolders() {
         viewModelScope.launch {
             appDao.getAllFolders().collect { folderEntities ->
                 _folders.value = folderEntities.map { it.name }
+            }
+        }
+    }
+
+    private fun loadDockApps() {
+        viewModelScope.launch {
+            appDao.getDockApps().collect { dockAppsList ->
+                _dockApps.value = dockAppsList
             }
         }
     }
@@ -94,5 +106,19 @@ class HomeViewModel @Inject constructor(
             Log.d("HomeViewModel", "App not found: $packageName")
         }
 
+    }
+
+    // App dock logic
+
+    fun addToDock(packageName: String) {
+        viewModelScope.launch {
+            appDao.addToDock(packageName)
+        }
+    }
+
+    fun removeFromDock(packageName: String) {
+        viewModelScope.launch {
+            appDao.removeFromDock(packageName)
+        }
     }
 }

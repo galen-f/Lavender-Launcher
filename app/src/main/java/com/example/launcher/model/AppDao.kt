@@ -5,6 +5,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AppDao {
+
+    // Apps section
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertApp(app: AppEntity)
 
@@ -16,6 +19,8 @@ interface AppDao {
 
     @Query("DELETE FROM apps WHERE packageName = :packageName")
     suspend fun deleteApp(packageName: String)
+
+    // Folders section
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertFolder(folder: FolderEntity)
@@ -44,4 +49,16 @@ interface AppDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Change to ignore to prevent duplicate apps?
     suspend fun insertAppIntoFolder(appFolder: AppFolderEntity)
+
+    //Docked Apps section
+
+    @Query("SELECT * FROM apps WHERE isDockApp = 1")
+    fun getDockApps(): Flow<List<AppEntity>>
+
+    @Query("UPDATE apps SET isDockApp = 1 WHERE packageName = :packageName")
+    suspend fun addToDock(packageName: String)
+
+    @Query("UPDATE apps SET isDockApp = 0 WHERE packageName = :packageName")
+    suspend fun removeFromDock(packageName: String)
+
 }

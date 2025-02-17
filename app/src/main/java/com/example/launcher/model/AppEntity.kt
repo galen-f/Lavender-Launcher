@@ -9,6 +9,7 @@ import androidx.room.PrimaryKey
 data class AppEntity(                       // Does not include app icon as this is performance deficient
     @PrimaryKey val packageName: String,    // Technical app name (used to launch the app)
     val label: String,                      // Humane readable app name (Used to display the app)
+    val isDockApp: Boolean = false          // boolean which tracks which apps are docked
 )
 
 @Entity(tableName = "folders")
