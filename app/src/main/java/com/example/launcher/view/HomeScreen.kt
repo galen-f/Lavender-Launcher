@@ -37,7 +37,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
     val folders = viewModel.folders.collectAsState().value
     var showInputDialog by remember { mutableStateOf(false) }
     var newFolderName by remember { mutableStateOf("") }
-    val appsInFolder by viewModel.appsInFolder.collectAsState()
+    val appsInFolder by viewModel.appsInFolder.collectAsState(emptyList())
 
     // TODO: Allow multiple folders to be open together
     var expandedFolder by remember { mutableStateOf<String?>(null) } // Track which folder is expanded
@@ -95,13 +95,13 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                                 .background(Color.White.copy(alpha = 0.9F))
                                 .padding(8.dp)
                         ) {
-                            appsInFolder.forEach { packageName ->
+                            appsInFolder.forEach { app ->
                                 Text(
-                                    text = packageName,
+                                    text = app.label,
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier
                                         .padding(8.dp)
-                                        .clickable { viewModel.launchApp(packageName) } // Launch app on click
+                                        .clickable { viewModel.launchApp(app.packageName) } // Launch app on click
                                 )
                             }
                         }

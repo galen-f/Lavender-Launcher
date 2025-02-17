@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.launcher.model.AppDao
+import com.example.launcher.model.AppEntity
 import com.example.launcher.model.AppFolderEntity
 import com.example.launcher.model.FolderEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,8 +30,8 @@ class HomeViewModel @Inject constructor(
     private val _folders = MutableStateFlow<List<String>>(emptyList())
     val folders: StateFlow<List<String>> = _folders
 
-    private val _appsInFolder = MutableStateFlow<List<String>>(emptyList())
-    val appsInFolder: StateFlow<List<String>> = _appsInFolder
+    private val _appsInFolder = MutableStateFlow<List<AppEntity>>(emptyList())
+    val appsInFolder: StateFlow<List<AppEntity>> = _appsInFolder
 
     init {
         loadFolders()
@@ -78,8 +79,8 @@ class HomeViewModel @Inject constructor(
             val folder = appDao.getFolderByName(folderName)
             if (folder != null) {
                 appDao.getAppsInFolder(folder.id).collect { appEntities ->
-                    _appsInFolder.value = appEntities.map { it.packageName }
-                    Log.d("HomeViewModel", "Apps in folder with folder $folderName")
+                    Log.d("HomeViewModel", "Apps fetched: ${appEntities.map { it.label }}")
+                    _appsInFolder.value = appEntities
                 }
             } else {
                 Log.d("HomeViewModel", "Folder not found: $folderName")
