@@ -33,7 +33,11 @@ import androidx.navigation.NavController
 import com.example.launcher.viewmodel.HomeViewModel
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavController) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    navController: NavController
+) {
+
     val folders = viewModel.folders.collectAsState().value
     var showInputDialog by remember { mutableStateOf(false) }
     var newFolderName by remember { mutableStateOf("") }

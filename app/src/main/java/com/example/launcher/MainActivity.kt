@@ -36,27 +36,31 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+            val homeViewModel: HomeViewModel = hiltViewModel()
+            val drawerViewModel: DrawerViewModel = hiltViewModel()
 
             LauncherTheme {
-                LauncherNavHost(navController)
+                LauncherNavHost(navController, homeViewModel, drawerViewModel)
             }
         }
     }
 }
 
 @Composable
-fun LauncherNavHost(navController: NavHostController) {
+fun LauncherNavHost(
+    navController: NavHostController,
+    homeViewModel: HomeViewModel,
+    drawerViewModel: DrawerViewModel
+) {
 
     NavHost(navController = navController, startDestination = "HomeScreen") {
         composable("appDrawer", arguments = emptyList()) {
             // HILT Injection
-            val viewModel: DrawerViewModel = hiltViewModel()
-            AppDrawer(viewModel = viewModel, navController = navController)
+            AppDrawer(viewModel = drawerViewModel, viewModel2 = homeViewModel, navController = navController)
         }
         composable("homeScreen", arguments = emptyList()) {
             // HILT Injection
-            val viewModel: HomeViewModel = hiltViewModel()
-            HomeScreen(viewModel = viewModel, navController = navController)
+            HomeScreen(viewModel = homeViewModel, navController = navController)
         }
 
     }

@@ -52,7 +52,12 @@ import com.example.launcher.viewmodel.HomeViewModel
 import com.google.accompanist.drawablepainter.DrawablePainter
 
 @Composable
-fun AppDrawer(navController: NavController, viewModel: DrawerViewModel = hiltViewModel(), viewModel2: HomeViewModel = hiltViewModel()) {
+fun AppDrawer(
+    navController: NavController,
+    viewModel: DrawerViewModel,
+    viewModel2: HomeViewModel
+) {
+
     // Get apps list from DrawerViewModel
     val apps by viewModel.apps.collectAsState()
     val folders by viewModel2.folders.collectAsState()
