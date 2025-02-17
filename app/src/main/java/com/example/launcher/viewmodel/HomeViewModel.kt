@@ -24,9 +24,6 @@ class HomeViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private val _message = MutableStateFlow("Welcome to the Home Screen!")
-    val message: StateFlow<String> = _message
-
     private val _folders = MutableStateFlow<List<String>>(emptyList())
     val folders: StateFlow<List<String>> = _folders
 
@@ -53,7 +50,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // TODO: Refuse to add duplicate apps
     fun addAppToFolder(packageName: String, folderName: String) {
         viewModelScope.launch {
             val folder = appDao.getFolderByName(folderName)

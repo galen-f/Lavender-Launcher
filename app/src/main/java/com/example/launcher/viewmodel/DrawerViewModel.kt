@@ -43,7 +43,6 @@ class DrawerViewModel @Inject constructor(
     }
 
     private fun fetchInstalledApps() {
-        // TODO: this function needs a lot of work I hate it, maybe could be split into two, retrieveApps and storeApps
         viewModelScope.launch {
             val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
             val userHandle = android.os.Process.myUserHandle()
@@ -51,8 +50,6 @@ class DrawerViewModel @Inject constructor(
 
             val installedApps = launcherApps.getActivityList(null, userHandle).mapNotNull {
                 if (it.applicationInfo.packageName != currentPackageName) {
-
-
                     AppEntity(
                         label = it.label.toString(),
                         packageName = it.applicationInfo.packageName,
@@ -61,7 +58,6 @@ class DrawerViewModel @Inject constructor(
                     null
                 }
             }
-
             installedApps.forEach { appDao.insertApp(it) }
         }
     }
