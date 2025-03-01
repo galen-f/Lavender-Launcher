@@ -45,7 +45,7 @@ interface AppDao {
     suspend fun deleteFolder(folderId: Int)
 
     @Query("DELETE FROM app_folders WHERE folderId = :folderId")
-    suspend fun deleteFolderApps(folderId: Int)
+    suspend fun deleteFolderApps(folderId: Int) // Delete all apps in folder
 
     @Insert(onConflict = OnConflictStrategy.REPLACE) // Change to ignore to prevent duplicate apps?
     suspend fun insertAppIntoFolder(appFolder: AppFolderEntity)

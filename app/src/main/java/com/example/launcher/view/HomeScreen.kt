@@ -2,9 +2,11 @@ package com.example.launcher.view
 
 import android.graphics.drawable.Drawable
 import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -20,6 +22,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +49,7 @@ import androidx.navigation.NavController
 import com.example.launcher.viewmodel.HomeViewModel
 import com.google.accompanist.drawablepainter.DrawablePainter
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -131,6 +136,7 @@ fun HomeScreen(
                                 columns = GridCells.Fixed(3),
                             ) {
                                 items(appsInFolder) {app ->
+                                    var showMenu by remember { mutableStateOf(false) } // For delete menu
                                     val icon: Drawable = packageManager.getApplicationIcon(app.packageName)
 
                                     Box( // Box containing single app item
@@ -140,7 +146,10 @@ fun HomeScreen(
                                     ) {
                                         Column( // Column designating the icon to be drawn above the label
                                             modifier = Modifier
-                                                .clickable { viewModel.launchApp(app.packageName) }, // Launch app on click
+                                                .combinedClickable (
+                                                    onClick = { viewModel.launchApp(app.packageName) },
+                                                    onLongClick = {showMenu = true}
+                                                ), // Launch app on click
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         )
                                         {
@@ -162,6 +171,18 @@ fun HomeScreen(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                             )
+                                            DropdownMenu(
+                                                expanded = showMenu,
+                                                onDismissRequest = { showMenu = false }
+                                            ) {
+                                                DropdownMenuItem(
+                                                    text = { Text("Remove from folder") },
+                                                    onClick = {
+                                                        viewModel.removeAppFromFolder(app.packageName, folder)
+                                                        showMenu = false
+                                                    }
+                                                )
+                                            }
                                         }
                                     }
                                 }

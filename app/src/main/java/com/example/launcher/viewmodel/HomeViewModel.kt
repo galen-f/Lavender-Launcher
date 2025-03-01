@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.launcher.model.AppDao
 import com.example.launcher.model.AppEntity
 import com.example.launcher.model.AppFolderEntity
@@ -72,12 +73,31 @@ class HomeViewModel @Inject constructor(
                         packageName = packageName
                     )
                 )
-                Log.d(
-                    "HomeViewModel",
-                    "App added to folder: \n Folder: $folderName,\n Package: $packageName,\n Folder ID: ${folder.id}"
-                )
             } else {
-                Log.d("HomeViewModel", "Folder not found: $folderName")
+                Log.e("HomeViewModel", "Tried to add app to folder $folderName, but folder was not found")
+            }
+        }
+    }
+
+    fun removeAppFromFolder(packageName: String, folderName: String){
+        viewModelScope.launch {
+            val folder = appDao.getFolderByName(folderName)
+            if (folder != null) {
+                appDao.removeAppFromFolder(packageName, folder.id)
+            } else {
+                Log.e("HomeViewModel", "Tried to remove app from folder, but folder was not found: $folderName")
+            }
+        }
+    }
+
+    fun removeFolder(folderName: String) {
+        viewModelScope.launch {
+            val folder = appDao.getFolderByName(folderName)
+            if (folder != null) {
+                appDao.deleteFolder(folder.id)
+                appDao.deleteFolderApps(folder.id) // Clear memory and delete app relations in the folder
+            } else {
+                Log.e("HomeViewModel", "Tried to remove folder $folderName, but folder was not found")
             }
         }
     }
@@ -91,7 +111,7 @@ class HomeViewModel @Inject constructor(
                     _appsInFolder.value = appEntities
                 }
             } else {
-                Log.d("HomeViewModel", "Folder not found: $folderName")
+                Log.e("HomeViewModel", "Tried to display apps in folder $folderName, but folder was not found")
             }
 
         }
@@ -103,7 +123,7 @@ class HomeViewModel @Inject constructor(
         if (intent != null) {
             context.startActivity(intent)
         } else {
-            Log.d("HomeViewModel", "App not found: $packageName")
+            Log.e("HomeViewModel", "Tried to launch app $packageName, but app was not found")
         }
 
     }
