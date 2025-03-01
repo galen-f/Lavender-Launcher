@@ -45,6 +45,10 @@ fun AppDock(viewModel: HomeViewModel) {
     val context = LocalContext.current
     val packageManager = context.packageManager
 
+    if (dockApps.isEmpty()) {
+        // BLANK
+        // If there are no apps in the app dock, just dont do anything
+    } else {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -58,39 +62,39 @@ fun AppDock(viewModel: HomeViewModel) {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            //TODO: if there are no apps in the dock, just remove the dock
-            dockApps.forEach { app ->
-                var showMenu by remember { mutableStateOf(false) }
-                val icon: Drawable = packageManager.getApplicationIcon(app.packageName)
-                Box(
-                    modifier = Modifier
-                        .padding(4.dp)
-                ){
-                    Column(
+                dockApps.forEach { app ->
+                    var showMenu by remember { mutableStateOf(false) }
+                    val icon: Drawable = packageManager.getApplicationIcon(app.packageName)
+                    Box(
                         modifier = Modifier
-                            .combinedClickable(
-                                onClick = { viewModel.launchApp(app.packageName) },
-                                onLongClick = { showMenu = true }
-                            )
-                            .padding(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .padding(4.dp)
                     ) {
-                        Image(
-                            painter = DrawablePainter(icon),
-                            contentDescription = "${app.label} icon",
-                            modifier = Modifier.size(50.dp)
-                        )
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
+                        Column(
+                            modifier = Modifier
+                                .combinedClickable(
+                                    onClick = { viewModel.launchApp(app.packageName) },
+                                    onLongClick = { showMenu = true }
+                                )
+                                .padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("Remove from dock") },
-                                onClick = {
-                                    viewModel.removeFromDock(app.packageName)
-                                    showMenu = false
-                                }
+                            Image(
+                                painter = DrawablePainter(icon),
+                                contentDescription = "${app.label} icon",
+                                modifier = Modifier.size(50.dp)
                             )
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Remove from dock") },
+                                    onClick = {
+                                        viewModel.removeFromDock(app.packageName)
+                                        showMenu = false
+                                    }
+                                )
+                            }
                         }
                     }
                 }
