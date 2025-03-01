@@ -104,6 +104,9 @@ fun HomeScreen(
             } else {
                 folders.forEach { folder ->
 
+                    var showFolderMenu by remember { mutableStateOf(false) }
+
+
                     // Define the folder modifier dynamically
                     val folderModifier =
                         if (expandedFolder == folder) { // Defines a new modifier for when the folder is opened.
@@ -127,15 +130,32 @@ fun HomeScreen(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
                                 .padding(8.dp)
-                                .clickable {
-                                    if (expandedFolder == folder) {
+                                .combinedClickable(
+                                    onClick = {
+                                        if (expandedFolder == folder) {
                                         expandedFolder = null // Collapse if already open
                                     } else {
                                         expandedFolder = folder // Expand the clicked folder
                                         viewModel.displayAppsInFolder(folder)
                                     }
-                                }
+                                    },
+                                    onLongClick = {showFolderMenu = true}
+                                )
                         )
+                        DropdownMenu(
+                            expanded = showFolderMenu,
+                            onDismissRequest = { showFolderMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Remove folder") },
+                                onClick = {
+                                    viewModel.removeFolder(
+                                        folder
+                                    )
+                                    showFolderMenu = false
+                                }
+                            )
+                        }
 
                         // display apps when folder is expanded
                         if (expandedFolder == folder) {
