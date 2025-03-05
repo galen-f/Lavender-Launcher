@@ -55,6 +55,9 @@ interface AppDao {
     @Query("SELECT * FROM apps WHERE isDockApp = 1")
     fun getDockApps(): Flow<List<AppEntity>>
 
+    @Query("SELECT COUNT(*) FROM apps WHERE isDockApp = 1")
+    suspend fun getDockAppCount(): Int // This is used to find out how many apps are currently docked
+
     @Query("UPDATE apps SET isDockApp = 1 WHERE packageName = :packageName")
     suspend fun addToDock(packageName: String)
 

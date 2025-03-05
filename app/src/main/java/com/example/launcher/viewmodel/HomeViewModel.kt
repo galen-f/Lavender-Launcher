@@ -3,6 +3,7 @@ package com.example.launcher.viewmodel
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -132,7 +133,18 @@ class HomeViewModel @Inject constructor(
 
     fun addToDock(packageName: String) {
         viewModelScope.launch {
-            appDao.addToDock(packageName)
+            val dockSize = appDao.getDockAppCount()
+
+            if (dockSize >= 4) {
+                Log.d("HomeViewModel", "Current app dock size exceeds maximum: $dockSize")
+                Toast.makeText(context, "App dock is full", Toast.LENGTH_SHORT).show()
+            } else {
+                Log.d(
+                    "HomeViewModel",
+                    "App $packageName added to app dock, current size: $dockSize"
+                )
+                appDao.addToDock(packageName)
+            }
         }
     }
 
