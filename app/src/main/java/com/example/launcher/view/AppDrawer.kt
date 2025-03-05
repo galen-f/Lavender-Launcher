@@ -145,6 +145,7 @@ fun AppDrawer(
                             text = { Text("Dock")},
                             onClick = {
                                 viewModel2.addToDock(app.packageName)
+                                Log.d("AppDrawer", "add to app dock button clicked")
                                 showMenu = false
                             }
                         )

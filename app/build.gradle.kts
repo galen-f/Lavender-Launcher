@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.datastore.preferences.core.jvm)
+    implementation(libs.androidx.datastore.preferences.rxjava2)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,6 +71,11 @@ dependencies {
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
+
+    // DataStore
+    implementation(libs.androidx.datastore)
+//    implementation(libs.androidx.datastore.rxjava2)
+//    implementation(libs.androidx.datastore.rxjava3)
 
     //Hilt
     implementation(libs.hilt.android)

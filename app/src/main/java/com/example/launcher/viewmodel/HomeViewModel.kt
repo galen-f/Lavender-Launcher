@@ -11,20 +11,24 @@ import com.example.launcher.model.AppDao
 import com.example.launcher.model.AppEntity
 import com.example.launcher.model.AppFolderEntity
 import com.example.launcher.model.FolderEntity
+import com.example.launcher.viewmodel.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-// TODO: Add Placeholder "tutorial" message
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val appDao: AppDao,
+    private val settingsRepository: SettingsRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private val _maxDockSize = MutableStateFlow(SettingsRepository.DEFAULT_DOCK_SIZE)
+    val maxDockSize: StateFlow<Int> = _maxDockSize
 
     private val _folders = MutableStateFlow<List<String>>(emptyList())
     val folders: StateFlow<List<String>> = _folders
@@ -133,16 +137,17 @@ class HomeViewModel @Inject constructor(
 
     fun addToDock(packageName: String) {
         viewModelScope.launch {
-            val dockSize = appDao.getDockAppCount()
+            Log.d("HomeViewModel", "addToDock called")
+            val maxSize = settingsRepository.maxDockSize.first() // Get the dock size from the settings system
 
-            if (dockSize >= 4) {
+            val dockSize = appDao.getDockAppCount()
+            Log.d("HomeViewModel", "max size: $maxSize, current size: $dockSize")
+
+            if (dockSize >= maxSize ) {
                 Log.d("HomeViewModel", "Current app dock size exceeds maximum: $dockSize")
                 Toast.makeText(context, "App dock is full", Toast.LENGTH_SHORT).show()
             } else {
-                Log.d(
-                    "HomeViewModel",
-                    "App $packageName added to app dock, current size: $dockSize"
-                )
+                Log.d("HomeViewModel", "App $packageName added to app dock, current size: $dockSize")
                 appDao.addToDock(packageName)
             }
         }

@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.example.launcher.model.AppDao
 import com.example.launcher.model.AppDatabase
+import com.example.launcher.viewmodel.SettingsRepository
+
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,5 +30,11 @@ object DatabaseModule {
     @Provides
     fun provideAppDao(appDatabase: AppDatabase): AppDao {
         return appDatabase.appDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSettingsRepository(@ApplicationContext context: Context): SettingsRepository {
+        return SettingsRepository(context)
     }
 }
