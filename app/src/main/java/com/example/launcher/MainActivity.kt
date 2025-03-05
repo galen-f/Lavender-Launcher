@@ -22,11 +22,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.launcher.viewmodel.DrawerViewModel
 
-// TODO: add widgets
-// TODO: add app dock
-// TODO: add screen-time watcher
-// TODO: add screen-time features
-// TODO: add custom settings system
+// TODO: Screen-time Tracker
+// TODO: Greyscale App Icons
+// TODO: Broadcast receiver for (un)installed apps
+// TODO: Quick Focus Mode Button
+// TODO: App Dock Limit
 
 @AndroidEntryPoint // HILT
 class MainActivity : ComponentActivity() {
