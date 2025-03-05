@@ -26,7 +26,6 @@ import com.example.launcher.viewmodel.DrawerViewModel
 // TODO: Greyscale App Icons
 // TODO: Broadcast receiver for (un)installed apps
 // TODO: Quick Focus Mode Button
-// TODO: App Dock Limit
 
 @AndroidEntryPoint // HILT
 class MainActivity : ComponentActivity() {
