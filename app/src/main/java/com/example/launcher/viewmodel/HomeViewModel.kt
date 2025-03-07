@@ -11,6 +11,8 @@ import com.example.launcher.model.AppDao
 import com.example.launcher.model.AppEntity
 import com.example.launcher.model.AppFolderEntity
 import com.example.launcher.model.FolderEntity
+import com.example.launcher.utils.ScreentimeManager
+
 import com.example.launcher.viewmodel.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -24,6 +26,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val appDao: AppDao,
     private val settingsRepository: SettingsRepository,
+    val screentimeManager: ScreentimeManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -39,9 +42,20 @@ class HomeViewModel @Inject constructor(
     private val _dockApps = MutableStateFlow<List<AppEntity>>(emptyList())
     val dockApps: StateFlow<List<AppEntity>> = _dockApps
 
+    private val _screenTime = MutableStateFlow(0L)
+    val screenTime: StateFlow<Long> = _screenTime
+
+    private val _showPermissionDialog = MutableStateFlow(false)
+    val showPermissionDialog: StateFlow<Boolean> = _showPermissionDialog
+
+    fun setPermissionDialogState(state: Boolean) {
+        _showPermissionDialog.value = state
+    }
+
     init {
         loadFolders()
         loadDockApps()
+        fetchScreenTime() // Check the screen-time every time the home screen starts up
     }
 
     private fun loadFolders() {
@@ -158,4 +172,20 @@ class HomeViewModel @Inject constructor(
             appDao.removeFromDock(packageName)
         }
     }
+
+    // Screen-time Tracker Logic
+
+    fun fetchScreenTime() {
+        viewModelScope.launch {
+            if (!screentimeManager.hasUsageAccess(context)) {
+                Log.e("HomeViewModel", "Usage access permission is not granted.")
+                _showPermissionDialog.value = true
+                return@launch
+            }
+
+            _screenTime.value = screentimeManager.getTotalScreenTime(context)
+            Log.d("HomeViewModel", "Screen-time queried")
+        }
+    }
+
 }
