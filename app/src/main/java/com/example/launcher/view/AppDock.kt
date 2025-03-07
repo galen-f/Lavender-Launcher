@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import com.example.launcher.viewmodel.HomeViewModel
 import com.google.accompanist.drawablepainter.DrawablePainter
 
-// TODO: Block more than 4 apps being added
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppDock(viewModel: HomeViewModel) {
