@@ -37,6 +37,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asImageBitmap
@@ -65,6 +66,7 @@ fun AppDrawer(
     val folders by viewModel2.folders.collectAsState()
     val context = LocalContext.current
     val packageManager = context.packageManager
+    val expandedMenuState = remember { mutableStateMapOf<String, Boolean>() } // Remember the dropdown (better for performance to be out here)
 
     // Layout for basic drawer interface
     LazyVerticalGrid(
@@ -100,7 +102,7 @@ fun AppDrawer(
         }
 
         items(apps) { app ->
-            var showMenu by remember { mutableStateOf(false) }
+            val isExpanded = expandedMenuState[app.packageName] ?: false
             val icon: Drawable = packageManager.getApplicationIcon(app.packageName)
 
             Box(
@@ -112,7 +114,7 @@ fun AppDrawer(
                     modifier = Modifier
                         .combinedClickable (
                             onClick = { viewModel.launchApp(app.packageName) },
-                            onLongClick = { showMenu = true }
+                            onLongClick = { expandedMenuState[app.packageName] = !isExpanded }
                         )
                         .padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -138,23 +140,22 @@ fun AppDrawer(
                             .fillMaxWidth()
                     )
                     DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
+                        expanded = isExpanded,
+                        onDismissRequest = { expandedMenuState[app.packageName] = false }
                     ) {
                         DropdownMenuItem(
                             text = { Text("Dock")},
                             onClick = {
                                 viewModel2.addToDock(app.packageName)
                                 Log.d("AppDrawer", "add to app dock button clicked")
-                                showMenu = false
-                            }
+                                expandedMenuState[app.packageName] = false                            }
                         )
                         folders.forEach { folder ->
                             DropdownMenuItem(
                                 text = { Text(folder) },
                                 onClick = {
                                     viewModel2.addAppToFolder(app.packageName, folder)
-                                    showMenu = false
+                                    expandedMenuState[app.packageName] = false
                                 }
                             )
                         }
