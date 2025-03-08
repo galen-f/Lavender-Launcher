@@ -30,10 +30,8 @@ class ScreentimeManager @Inject constructor() {
             set(Calendar.MILLISECOND, 0)
         }
         val startTime = calendar.timeInMillis // milliseconds from 1970 to midnight the day of today
-//        timeConverter(startTime, "startTime") // Logs the start time
 
         val endTime = System.currentTimeMillis() // Milliseconds from 1970 to the current time
-//        timeConverter(endTime, "endTime") // Logs the end time
 
 //        logApps(context)
 
@@ -68,21 +66,6 @@ class ScreentimeManager @Inject constructor() {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(intent)
-    }
-
-
-    fun timeConverter(timeInMillis: Long, label: String) {
-
-        // Convert to Date object
-        val date = Date(timeInMillis)
-
-        // Define the format
-        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-
-        // Format the date
-        val formattedTime = sdf.format(date)
-
-        Log.d("screentimeManager","$label - Formatted Time: $formattedTime")
     }
 
     // Function which returns a list of the top 50 apps, commented out but kept in case I want to display the top used apps
