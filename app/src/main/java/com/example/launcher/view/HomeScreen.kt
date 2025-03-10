@@ -1,23 +1,18 @@
 package com.example.launcher.view
 
 import androidx.compose.material3.AlertDialog
-import android.content.Intent
-import android.graphics.drawable.Drawable
-import android.provider.Settings
-import android.util.Log
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -26,8 +21,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,22 +30,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.launcher.viewmodel.HomeViewModel
-import com.google.accompanist.drawablepainter.DrawablePainter
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -64,19 +56,57 @@ fun HomeScreen(
     var showInputDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val density = LocalDensity.current
+    val configuration = LocalConfiguration.current
     val showPermissionDialog = viewModel.showPermissionDialog.collectAsState()
+
+    val totalWidth = with(density) { configuration.screenWidthDp.dp.toPx() } // Screen width
+    val duration = 300 // Animation speed in ms
+    val animationSpec = tween<Float>(duration) // Animation when returning
+    val decaySpec = rememberSplineBasedDecay<Float>() // Physics based decay
+    val anchors = DraggableAnchors {
+        0 at 0f // Default position anchor
+        1 at -totalWidth // Right swipe anchor
+        2 at totalWidth // Left swipe anchor
+    }
+
+    val offsetX by remember { mutableStateOf(0f) }
+    val draggableState = remember {
+        AnchoredDraggableState(
+            initialValue = 0,
+            anchors = anchors,
+            positionalThreshold = { totalWidth * 0.4f }, // 40% of screen to swipe
+            velocityThreshold = { with(density) { 125.dp.toPx() } }, //Fling speed
+            snapAnimationSpec = animationSpec, // Animation when releasing mid-swipe
+            decayAnimationSpec = decaySpec, // Fling animation
+            confirmValueChange = { true } // Always allow swiping
+        )
+    }
+
+    // Animate the offset for smooth sliding effect
+    val animatedOffsetX by animateFloatAsState(
+        targetValue = draggableState.offset,
+        animationSpec = animationSpec,
+        label = "Animated Drawer Offset"
+    )
+
+    LaunchedEffect(offsetX) {
+        snapshotFlow { draggableState.targetValue }
+            .collect { target ->
+                if (target == 1 || target == 2) { // If swiped left or right
+                    navController.navigate("appDrawer") // Go to appDrawer
+                }
+            }
+    }
 
     Box( // Screen box
         modifier = Modifier
             .fillMaxSize()
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures { change, dragAmount -> // Gesture Based Navigation (Swipe right to go to app drawer)
-                    change.consume()
-                    if (dragAmount > 50F) {
-                        navController.navigate("appDrawer")
-                    }
-                }
-            }
+            .graphicsLayer { translationX = animatedOffsetX }
+            .anchoredDraggable(
+                state = draggableState,
+                orientation = Orientation.Horizontal,
+            )
             .pointerInput(Unit) {
                 detectTapGestures(onLongPress = {
                     showInputDialog = true // Trigger folder creation dialog
