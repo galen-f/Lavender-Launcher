@@ -88,7 +88,7 @@ fun FolderList(viewModel: HomeViewModel) {
                 expanded = showFolderMenu,
                 onDismissRequest = { showFolderMenu = false }
             ) {
-                DropdownMenuItem( // TODO: This menu is revealed on all folders
+                DropdownMenuItem(
                     text = { Text("Remove folder") },
                     onClick = {
                         viewModel.removeFolder(
