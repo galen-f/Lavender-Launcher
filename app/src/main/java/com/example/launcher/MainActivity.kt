@@ -22,7 +22,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.launcher.viewmodel.DrawerViewModel
 
-// TODO: Fix lag on dock screen
 // TODO: Greyscale App Icons
 // TODO: Broadcast receiver for (un)installed apps
 // TODO: Quick Focus Mode Button
