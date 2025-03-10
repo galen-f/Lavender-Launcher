@@ -4,15 +4,10 @@ import android.graphics.drawable.Drawable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -40,16 +35,17 @@ import androidx.compose.ui.unit.dp
 import com.example.launcher.viewmodel.HomeViewModel
 import com.google.accompanist.drawablepainter.DrawablePainter
 
-// TODO: Block more than 4 apps being added
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FolderList(viewModel: HomeViewModel) {
     val folders = viewModel.folders.collectAsState().value
 
     var expandedFolder by remember { mutableStateOf<String?>(null) } // Track which folder is expanded
-    var showFolderMenu by remember { mutableStateOf(false) }
+
 
     folders.forEach { folder ->
+        var showFolderMenu by remember { mutableStateOf(false) }
+
         val folderModifier =
             if (expandedFolder == folder) { // Makes a new look for the folder when its opened (dark background)
                 Modifier
@@ -81,8 +77,10 @@ fun FolderList(viewModel: HomeViewModel) {
                                 viewModel.displayAppsInFolder(folder)
                             }
                         },
-                        onLongClick = { showFolderMenu = true }
-                    )
+                        onLongClick = { showFolderMenu = true },
+                    ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
             // Press and hold folder to show this menu (Allows use to delete the folder)
@@ -90,7 +88,7 @@ fun FolderList(viewModel: HomeViewModel) {
                 expanded = showFolderMenu,
                 onDismissRequest = { showFolderMenu = false }
             ) {
-                DropdownMenuItem(
+                DropdownMenuItem( // TODO: This menu is revealed on all folders
                     text = { Text("Remove folder") },
                     onClick = {
                         viewModel.removeFolder(
