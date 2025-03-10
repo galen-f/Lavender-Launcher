@@ -20,9 +20,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheetDefaults.properties
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.example.launcher.viewmodel.HomeViewModel
 
@@ -175,42 +182,54 @@ fun HomeScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable // Dialog Box that appears when the user wishes to add a new folder
 fun FolderAddDialog(viewModel: HomeViewModel, onDismiss: () -> Unit) {
     var newFolderName by remember { mutableStateOf("") }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    BasicAlertDialog(
+        onDismissRequest = onDismiss,
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White.copy(alpha = 0.0F))
+            .fillMaxWidth()
             .padding(16.dp),
     ) {
-        BasicTextField( // Folder creation input
-            value = newFolderName,
-            onValueChange = { newFolderName = it },
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = {
-                if (newFolderName.isNotBlank()) {
-                    viewModel.addFolder(newFolderName)
-                    newFolderName = ""
-                    onDismiss()
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column (
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Create new folder"
+                )
+                OutlinedTextField(
+                    value = newFolderName,
+                    onValueChange = { newFolderName = it },
+                    label = { Text("Folder Name")}
+                )
+
+                Row(
+
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = {
+                            if (newFolderName.isNotBlank()) {
+                                viewModel.addFolder(newFolderName)
+                                newFolderName = ""
+                                onDismiss()
+                            }
+                        }
+                    ) {
+                        Text("Add")
+                    }
                 }
-            }),
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.LightGray.copy(alpha = 0.6F))
-                .padding(8.dp)
-        )
-        Button(onClick = { // Folder creation button
-            if (newFolderName.isNotBlank()) {
-                viewModel.addFolder(newFolderName)
-                newFolderName = ""
-                onDismiss()
             }
-        }) {
-            Text("Add Folder")
         }
     }
 }
