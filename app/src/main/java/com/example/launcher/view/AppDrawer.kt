@@ -1,9 +1,6 @@
 package com.example.launcher.view
 
-import android.content.ContentValues.TAG
-import android.content.Context
-import android.graphics.drawable.Animatable
-import android.graphics.drawable.BitmapDrawable
+
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
@@ -12,17 +9,11 @@ import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -43,27 +34,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.launcher.viewmodel.DrawerViewModel
 import com.example.launcher.viewmodel.HomeViewModel
@@ -97,7 +80,7 @@ fun AppDrawer(
         2 at totalWidth // Left swipe anchor
     }
 
-    var offsetX by remember { mutableStateOf(0f) }
+    val offsetX by remember { mutableStateOf(0f) }
     val draggableState = remember {
         AnchoredDraggableState(
          initialValue = 0,
@@ -153,11 +136,6 @@ fun AppDrawer(
                     .padding(64.dp), // Padding around the title
                 textAlign = TextAlign.Center,
                 color = Color.Black
-            )
-            Text( // TODO: REMOVE
-                    text = "Drag Value: ${draggableState.offset}, Drag Target: ${draggableState.targetValue}",
-            color = Color.Red,
-            modifier = Modifier.padding(16.dp)
             )
         }
 
