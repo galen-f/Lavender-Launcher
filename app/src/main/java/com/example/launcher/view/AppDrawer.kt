@@ -6,6 +6,7 @@ import android.graphics.drawable.Animatable
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -53,6 +54,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
@@ -87,32 +89,39 @@ fun AppDrawer(
 
     val totalWidth = with(density) { configuration.screenWidthDp.dp.toPx() } // Screen width
     val duration = 300 // Animation speed in ms
-    val animationSpec = tween<Float>(duration) // Tween animation
+    val animationSpec = tween<Float>(duration) // Animation when returning
     val decaySpec = rememberSplineBasedDecay<Float>() // Physics based decay
     val anchors = DraggableAnchors {
-        0 at 0f
-        1 at -totalWidth
-        2 at totalWidth
+        0 at 0f // Default position anchor
+        1 at -totalWidth // Right swipe anchor
+        2 at totalWidth // Left swipe anchor
     }
 
     var offsetX by remember { mutableStateOf(0f) }
     val draggableState = remember {
         AnchoredDraggableState(
          initialValue = 0,
-            anchors = anchors,
-            positionalThreshold = { totalWidth * 0.4f }, // 40% of screen to swipe
-            velocityThreshold = { with(density) { 125.dp.toPx() } }, //Fling speed
-            snapAnimationSpec = animationSpec, // Animation when releasing mid-swipe
-            decayAnimationSpec = decaySpec, // Fling animation
-            confirmValueChange = {true} // Always allow swiping
+         anchors = anchors,
+         positionalThreshold = { totalWidth * 0.4f }, // 40% of screen to swipe
+         velocityThreshold = { with(density) { 125.dp.toPx() } }, //Fling speed
+         snapAnimationSpec = animationSpec, // Animation when releasing mid-swipe
+         decayAnimationSpec = decaySpec, // Fling animation
+         confirmValueChange = { true } // Always allow swiping
         )
     }
+
+    // Animate the offset for smooth sliding effect
+    val animatedOffsetX by animateFloatAsState(
+        targetValue = draggableState.offset,
+        animationSpec = animationSpec,
+        label = "Animated Drawer Offset"
+    )
 
     LaunchedEffect(offsetX) {
         snapshotFlow { draggableState.targetValue }
             .collect { target ->
                 if (target == 1 || target == 2) { // If swiped left or right
-                    navController.navigate("homeScreen")
+                    navController.navigate("homeScreen") // Go to homescreen
                 }
             }
     }
@@ -125,6 +134,7 @@ fun AppDrawer(
                 color = Color.LightGray.copy(alpha = 0.8F)
             ) // BG color and transparency value.
             .fillMaxSize()
+            .graphicsLayer { translationX = animatedOffsetX }
             .anchoredDraggable(
                 state = draggableState,
                 orientation = Orientation.Horizontal,
