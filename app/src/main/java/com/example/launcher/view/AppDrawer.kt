@@ -35,16 +35,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.graphicsLayer
@@ -52,6 +59,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -61,7 +69,7 @@ import com.example.launcher.viewmodel.DrawerViewModel
 import com.example.launcher.viewmodel.HomeViewModel
 import com.google.accompanist.drawablepainter.DrawablePainter
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AppDrawer(
     navController: NavController,
@@ -79,6 +87,17 @@ fun AppDrawer(
     val packageManager = context.packageManager
     val expandedMenuState = remember { mutableStateMapOf<String, Boolean>() } // Remember the dropdown (better for performance to be out here)
     val greyscaleMatrix = ColorMatrix().apply { setToSaturation(0f) }
+
+    // State for the search query
+    var searchQuery by remember { mutableStateOf("") }
+
+    // Derive a filtered list of apps based on the query.
+    // If the query is blank, show all apps.
+    val filteredApps = if (searchQuery.isBlank()) {
+        apps
+    } else {
+        apps.filter { it.label.contains(searchQuery, ignoreCase = true) }
+    }
 
     val totalWidth = with(density) { configuration.screenWidthDp.dp.toPx() } // Screen width
     val duration = 300 // Animation speed in ms
@@ -126,6 +145,7 @@ fun AppDrawer(
             .background(
                 color = MaterialTheme.colorScheme.background.copy(alpha = 0.8F)
             ) // BG color and transparency value.
+            .padding(bottom = 20.dp)
             .fillMaxSize()
             .graphicsLayer { translationX = animatedOffsetX }
             .anchoredDraggable(
@@ -137,9 +157,14 @@ fun AppDrawer(
 
 
         // Title item
-        item(span = { GridItemSpan(2) }) { // Span across 2 columns
+        item(span = { GridItemSpan(2) }) { // Span across 2 columns, hols settings button and apps label
             Box(
-
+                modifier = Modifier
+                    .padding(
+                        16.dp,
+                        bottom = 32.dp,
+                        top = 64.dp
+                    ) // Padding around title and settings
             )
             {
                 Button(
@@ -149,7 +174,7 @@ fun AppDrawer(
                         contentColor = MaterialTheme.colorScheme.onPrimary     // White text and icon
                     ),
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.CenterEnd)
                         .padding(8.dp)
                 ) {
 
@@ -167,17 +192,28 @@ fun AppDrawer(
                 }
                 Text(
                     text = "Apps",
-                    style = MaterialTheme.typography.headlineLarge,
+                    style = MaterialTheme.typography.displayMedium,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(64.dp), // Padding around the title
-                    textAlign = TextAlign.Center,
+                        .padding(8.dp) // Padding around the title
+                        .align(Alignment.CenterStart),
+                    textAlign = TextAlign.Left,
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
 
-        items(apps) { app ->
+        item (span = { GridItemSpan(2) }) { // Search Bar
+            TextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Search Apps") },
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
+        }
+
+        items(filteredApps) { app -> // Only display apps that have been searched for
             val isExpanded = expandedMenuState[app.packageName] ?: false
             val icon: Drawable = packageManager.getApplicationIcon(app.packageName)
 
