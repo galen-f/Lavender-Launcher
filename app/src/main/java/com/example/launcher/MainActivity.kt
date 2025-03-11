@@ -29,6 +29,7 @@ import com.example.launcher.viewmodel.HomeViewModel
 
 // TODO: Broadcast receiver for (un)installed apps
 // TODO: Search on app drawer
+// TODO: Dynamic Color Themes
 
 @AndroidEntryPoint // HILT
 class MainActivity : ComponentActivity() {
