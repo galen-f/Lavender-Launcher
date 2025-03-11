@@ -15,6 +15,7 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,9 +35,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -47,10 +51,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.launcher.R
 import com.example.launcher.viewmodel.DrawerViewModel
 import com.example.launcher.viewmodel.HomeViewModel
 import com.google.accompanist.drawablepainter.DrawablePainter
@@ -132,30 +138,42 @@ fun AppDrawer(
 
         // Title item
         item(span = { GridItemSpan(2) }) { // Span across 2 columns
-            Text(
-                text = "Apps",
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(64.dp), // Padding around the title
-                textAlign = TextAlign.Center,
-                color = Color.Black
+            Box(
+
             )
-        }
+            {
+                Button(
+                    onClick = {viewModel.toggleGreyScaleApps()} ,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.DarkGray,  // Black background
+                        contentColor = Color.White     // White text and icon
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp)
+                ) {
 
-        item(span = {GridItemSpan(1)}) {
-            Button(
-                onClick = {viewModel.toggleGreyScaleApps()}
-            ) {
-                Text("Greyscale")
-            }
-        }
+                        Icon(
+                            painter = painterResource(id = R.drawable.tonality_24),
+                            contentDescription = "Toggle Greyscale",
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(4.dp)
+                        )
+                        Text(
+                            text = "Grey-Scale"
+                        )
 
-        item(span = {GridItemSpan(1)}) {
-            Button(
-                onClick = {viewModel.sendToWellbeing(context)}
-            ) {
-                Text("Digital Wellbeing")
+                }
+                Text(
+                    text = "Apps",
+                    style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(64.dp), // Padding around the title
+                    textAlign = TextAlign.Center,
+                    color = Color.Black
+                )
             }
         }
 

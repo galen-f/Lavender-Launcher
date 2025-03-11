@@ -23,7 +23,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.launcher.viewmodel.DrawerViewModel
 
 // TODO: Broadcast receiver for (un)installed apps
-// TODO: Digital Wellbeing Button
 // TODO: Search on app drawer
 
 @AndroidEntryPoint // HILT

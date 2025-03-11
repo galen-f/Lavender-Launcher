@@ -1,6 +1,8 @@
 package com.example.launcher.viewmodel
 
 import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
 import androidx.lifecycle.ViewModel
@@ -86,17 +88,10 @@ class DrawerViewModel @Inject constructor(
         }
     }
 
-    suspend fun isGreyscaleEnabled(): Boolean {
-            return settingsRepository.isGreyScaleIconsEnabled.first()
-    }
 
     fun toggleGreyScaleApps() {
         viewModelScope.launch {
             settingsRepository.toggleGreyScaleIcons()
         }
-    }
-
-    fun sendToWellbeing(context: Context) {
-        Log.d("DrawerViewModel", "User has been sent to digital wellbeing")
     }
 }
