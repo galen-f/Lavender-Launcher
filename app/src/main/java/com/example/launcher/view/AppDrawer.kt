@@ -34,12 +34,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -62,12 +65,15 @@ fun AppDrawer(
 
     // Get apps list from DrawerViewModel
     val apps by viewModel.apps.collectAsState()
+    val greyScale by viewModel.greyScaledApps.collectAsState()
     val folders by viewModel2.folders.collectAsState()
     val context = LocalContext.current
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     val packageManager = context.packageManager
     val expandedMenuState = remember { mutableStateMapOf<String, Boolean>() } // Remember the dropdown (better for performance to be out here)
+    val greyscaleMatrix = ColorMatrix().apply { setToSaturation(0f) }
+    val isGreyscaleEnabled = greyScale
 
 
     val totalWidth = with(density) { configuration.screenWidthDp.dp.toPx() } // Screen width
@@ -139,6 +145,22 @@ fun AppDrawer(
             )
         }
 
+        item(span = {GridItemSpan(1)}) {
+            Button(
+                onClick = {viewModel.toggleGreyScaleApps()}
+            ) {
+                Text("Greyscale")
+            }
+        }
+
+        item(span = {GridItemSpan(1)}) {
+            Button(
+                onClick = {viewModel.sendToWellbeing(context)}
+            ) {
+                Text("Digital Wellbeing")
+            }
+        }
+
         items(apps) { app ->
             val isExpanded = expandedMenuState[app.packageName] ?: false
             val icon: Drawable = packageManager.getApplicationIcon(app.packageName)
@@ -162,6 +184,7 @@ fun AppDrawer(
                     Image(
                         painter = DrawablePainter(icon), // This is the use of the accompanist library, which is shit, just an fyi, took my almost two days to get working
                         contentDescription = "${app.label} icon",
+                        colorFilter = if (isGreyscaleEnabled) ColorFilter.colorMatrix(greyscaleMatrix) else null,
                         modifier = Modifier
                             .size(50.dp) // Icon Size
                             .padding(end = 12.dp) // Space between icon and text

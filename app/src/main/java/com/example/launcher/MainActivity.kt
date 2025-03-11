@@ -22,9 +22,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.launcher.viewmodel.DrawerViewModel
 
-// TODO: Greyscale App Icons
 // TODO: Broadcast receiver for (un)installed apps
-// TODO: Quick Focus Mode Button
+// TODO: Digital Wellbeing Button
+// TODO: Search on app drawer
 
 @AndroidEntryPoint // HILT
 class MainActivity : ComponentActivity() {
