@@ -73,8 +73,6 @@ fun AppDrawer(
     val packageManager = context.packageManager
     val expandedMenuState = remember { mutableStateMapOf<String, Boolean>() } // Remember the dropdown (better for performance to be out here)
     val greyscaleMatrix = ColorMatrix().apply { setToSaturation(0f) }
-    val isGreyscaleEnabled = greyScale
-
 
     val totalWidth = with(density) { configuration.screenWidthDp.dp.toPx() } // Screen width
     val duration = 300 // Animation speed in ms
@@ -184,7 +182,7 @@ fun AppDrawer(
                     Image(
                         painter = DrawablePainter(icon), // This is the use of the accompanist library, which is shit, just an fyi, took my almost two days to get working
                         contentDescription = "${app.label} icon",
-                        colorFilter = if (isGreyscaleEnabled) ColorFilter.colorMatrix(greyscaleMatrix) else null,
+                        colorFilter = if (greyScale) ColorFilter.colorMatrix(greyscaleMatrix) else null,
                         modifier = Modifier
                             .size(50.dp) // Icon Size
                             .padding(end = 12.dp) // Space between icon and text

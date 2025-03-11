@@ -17,8 +17,10 @@ import com.example.launcher.viewmodel.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,6 +43,9 @@ class HomeViewModel @Inject constructor(
 
     private val _dockApps = MutableStateFlow<List<AppEntity>>(emptyList())
     val dockApps: StateFlow<List<AppEntity>> = _dockApps
+
+    val greyScaledApps: StateFlow<Boolean> = settingsRepository.isGreyScaleIconsEnabled
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val _screenTime = MutableStateFlow(0L)
     val screenTime: StateFlow<Long> = _screenTime

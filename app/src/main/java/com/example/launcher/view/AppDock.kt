@@ -30,6 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,6 +43,8 @@ import com.google.accompanist.drawablepainter.DrawablePainter
 @Composable
 fun AppDock(viewModel: HomeViewModel) {
     val dockApps by viewModel.dockApps.collectAsState(emptyList())
+    val greyScale by viewModel.greyScaledApps.collectAsState()
+    val greyscaleMatrix = ColorMatrix().apply { setToSaturation(0f) }
     val context = LocalContext.current
     val packageManager = context.packageManager
 
@@ -80,6 +84,7 @@ fun AppDock(viewModel: HomeViewModel) {
                             Image(
                                 painter = DrawablePainter(icon),
                                 contentDescription = "${app.label} icon",
+                                colorFilter = if (greyScale) ColorFilter.colorMatrix(greyscaleMatrix) else null,
                                 modifier = Modifier.size(50.dp)
                             )
                             DropdownMenu(

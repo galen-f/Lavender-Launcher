@@ -28,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -114,6 +116,8 @@ fun FolderItem(viewModel: HomeViewModel, folder: String) {
     val context = LocalContext.current
     val packageManager = context.packageManager
 
+    val greyscaleMatrix = ColorMatrix().apply { setToSaturation(0f) }
+    val greyScale by viewModel.greyScaledApps.collectAsState()
 
     Column(
         // Column that designates the folder label to appear above the app items
@@ -147,6 +151,7 @@ fun FolderItem(viewModel: HomeViewModel, folder: String) {
                         Image( // App Icon
                             painter = DrawablePainter(icon), // This is the use of the accompanist library, which is shit, just an fyi, took my almost two days to get working
                             contentDescription = "${app.label} icon",
+                            colorFilter = if (greyScale) ColorFilter.colorMatrix(greyscaleMatrix) else null,
                             modifier = Modifier
                                 .size(40.dp) // Icon Size
                                 .padding(5.dp)
