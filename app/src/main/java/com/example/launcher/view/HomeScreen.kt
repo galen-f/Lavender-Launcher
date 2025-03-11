@@ -48,6 +48,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
@@ -131,7 +132,7 @@ fun HomeScreen(
                 Text(
                     text = "Press and hold anywhere to add a new folder",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.White.copy(alpha = 0.7F),
+                    color = Color.LightGray.copy(alpha = 0.7F),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(16.dp)
@@ -198,7 +199,7 @@ fun FolderAddDialog(viewModel: HomeViewModel, onDismiss: () -> Unit) {
         ) {
             Column (
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -243,8 +244,8 @@ fun ScreenTimeTracker(viewModel: HomeViewModel) {
 
     Text(
         text = "Screen time: $hours h $minutes min",
-        style = MaterialTheme.typography.titleLarge,
-        color = Color.White,
+        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold),
+        color = MaterialTheme.colorScheme.onBackground,
 
         textAlign = TextAlign.Center,
         modifier = Modifier

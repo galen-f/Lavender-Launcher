@@ -57,7 +57,7 @@ fun AppDock(viewModel: HomeViewModel) {
             .fillMaxWidth()
             .height(100.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.DarkGray.copy(alpha = 0.6F))
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.6F))
             .padding(8.dp)
     ) {
         Row(

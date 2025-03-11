@@ -124,7 +124,7 @@ fun AppDrawer(
         columns = GridCells.Fixed(2), // # items per row
         modifier = Modifier
             .background(
-                color = Color.LightGray.copy(alpha = 0.8F)
+                color = MaterialTheme.colorScheme.background.copy(alpha = 0.8F)
             ) // BG color and transparency value.
             .fillMaxSize()
             .graphicsLayer { translationX = animatedOffsetX }
@@ -145,8 +145,8 @@ fun AppDrawer(
                 Button(
                     onClick = { navController.navigate("settingsScreen") } ,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.DarkGray,  // Black background
-                        contentColor = Color.White     // White text and icon
+                        containerColor = MaterialTheme.colorScheme.primary,  // Black background
+                        contentColor = MaterialTheme.colorScheme.onPrimary     // White text and icon
                     ),
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
@@ -172,7 +172,7 @@ fun AppDrawer(
                         .fillMaxWidth()
                         .padding(64.dp), // Padding around the title
                     textAlign = TextAlign.Center,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
@@ -209,6 +209,7 @@ fun AppDrawer(
                     // Display app text
                     Text(
                         text = app.label,
+                        color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.labelLarge,
                         textAlign = TextAlign.Left,
                         maxLines = 2,

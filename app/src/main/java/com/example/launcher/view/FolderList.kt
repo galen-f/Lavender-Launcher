@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -53,7 +54,7 @@ fun FolderList(viewModel: HomeViewModel) {
                 Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color.DarkGray.copy(alpha = 0.6F))
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.6F))
                     .padding(8.dp)
             } else {
                 Modifier
@@ -65,8 +66,8 @@ fun FolderList(viewModel: HomeViewModel) {
         ) {
             Text( // Folder Label
                 text = folder,
-                style = MaterialTheme.typography.displaySmall,
-                color = Color.White,
+                style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
                     .padding(8.dp)

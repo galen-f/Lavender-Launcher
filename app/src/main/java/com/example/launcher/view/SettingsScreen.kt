@@ -44,7 +44,7 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                color = Color.LightGray.copy(alpha = 0.8F)
+                color = MaterialTheme.colorScheme.background.copy(alpha = 0.8F)
             ) // BG color and transparency value.
     )
     {
@@ -54,6 +54,7 @@ fun SettingsScreen(
         ) {
             Text(
                 text = "Settings",
+                color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -63,12 +64,17 @@ fun SettingsScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Toggle Dark-Mode", modifier = Modifier.weight(1f))
+                Text(
+                    text = "Toggle Dark-Mode",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .weight(1f)
+                )
                 Button(
                     onClick = { viewModel.toggleDarkMode() },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.DarkGray,  // Black background
-                        contentColor = Color.White     // White text and icon
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     modifier = Modifier
                         .padding(8.dp)
@@ -97,13 +103,16 @@ fun SettingsScreen(
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             ) {
-                Text(text = "Toggle Grey-Scaled App Icons", modifier = Modifier.weight(1f))
+                Text(
+                    text = "Toggle Grey-Scaled App Icons",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.weight(1f))
 
                 Button(
                     onClick = { viewModel.toggleGreyScaleApps() },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.DarkGray,  // Black background
-                        contentColor = Color.White     // White text and icon
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     modifier = Modifier
                         .padding(8.dp)
@@ -125,7 +134,11 @@ fun SettingsScreen(
             }
 
             // Dock Size Slider
-            Text(text = "Dock Size: $dockSize", modifier = Modifier.padding(top = 16.dp))
+            Text(
+                text = "Dock Size: $dockSize",
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(top = 16.dp)
+            )
             Slider(
                 value = dockSize.toFloat(),
                 onValueChange = { newValue ->
