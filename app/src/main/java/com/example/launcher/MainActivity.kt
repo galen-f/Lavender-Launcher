@@ -29,7 +29,6 @@ import com.example.launcher.viewmodel.HomeViewModel
 
 // TODO: Broadcast receiver for (un)installed apps
 // TODO: Workmanager for screen-time tracker
-// TODO: Search on app drawer
 
 @AndroidEntryPoint // HILT
 class MainActivity : ComponentActivity() {
