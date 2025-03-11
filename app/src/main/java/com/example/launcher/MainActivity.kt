@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
@@ -37,9 +39,9 @@ class MainActivity : ComponentActivity() {
             val homeViewModel: HomeViewModel = hiltViewModel()
             val drawerViewModel: DrawerViewModel = hiltViewModel()
             val settingsViewModel: SettingsViewModel = hiltViewModel()
+            val isDarkMode by settingsViewModel.darkMode.collectAsState() // settings repo sends to settingsVM, exposes it for here, not sure if this is ideal?
 
-
-            LauncherTheme {
+            LauncherTheme(darkTheme = isDarkMode) {
                 LauncherNavHost(navController, homeViewModel, drawerViewModel, settingsViewModel)
             }
         }

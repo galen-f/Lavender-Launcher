@@ -1,6 +1,7 @@
 package com.example.launcher.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
@@ -33,7 +34,8 @@ class SettingsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     // For dark mode, assume you add a similar DataStore key and methods in your repository.
-    private val DARK_MODE_KEY = booleanPreferencesKey("dark_mode_enabled")
+    private val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
+
     val isDarkModeEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[DARK_MODE_KEY] ?: false
     }
@@ -57,8 +59,9 @@ class SettingsViewModel @Inject constructor(
     fun toggleDarkMode() {
         viewModelScope.launch {
             context.dataStore.edit { preferences ->
-                val current = preferences[DARK_MODE_KEY] ?: false
-                preferences[DARK_MODE_KEY] = !current
+                val current = preferences[DARK_MODE_KEY] ?: false // Check state, default to false
+                preferences[DARK_MODE_KEY] = !current // Inverse current
+                Log.d("Settings", "Dark Mode Enabled: $current")
             }
         }
     }
