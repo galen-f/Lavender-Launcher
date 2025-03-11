@@ -12,8 +12,9 @@ import androidx.navigation.NavHostController
 import com.example.launcher.ui.theme.LauncherTheme
 import com.example.launcher.view.AppDrawer
 import com.example.launcher.view.HomeScreen
+import com.example.launcher.view.SettingsScreen
+
 import dagger.hilt.android.AndroidEntryPoint
-import com.example.launcher.viewmodel.HomeViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 // Navigation Support Libraries
@@ -21,6 +22,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.launcher.viewmodel.DrawerViewModel
+import com.example.launcher.viewmodel.SettingsViewModel
+import com.example.launcher.viewmodel.HomeViewModel
 
 // TODO: Broadcast receiver for (un)installed apps
 // TODO: Search on app drawer
@@ -33,9 +36,11 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val homeViewModel: HomeViewModel = hiltViewModel()
             val drawerViewModel: DrawerViewModel = hiltViewModel()
+            val settingsViewModel: SettingsViewModel = hiltViewModel()
+
 
             LauncherTheme {
-                LauncherNavHost(navController, homeViewModel, drawerViewModel)
+                LauncherNavHost(navController, homeViewModel, drawerViewModel, settingsViewModel)
             }
         }
     }
@@ -45,7 +50,8 @@ class MainActivity : ComponentActivity() {
 fun LauncherNavHost(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
-    drawerViewModel: DrawerViewModel
+    drawerViewModel: DrawerViewModel,
+    settingsViewModel: SettingsViewModel
 ) {
 
     NavHost(navController = navController, startDestination = "HomeScreen") {
@@ -57,6 +63,9 @@ fun LauncherNavHost(
             // HILT Injection
             HomeScreen(viewModel = homeViewModel, navController = navController)
         }
-
+        composable("settingsScreen", arguments = emptyList()) {
+            // HILT Injection
+            SettingsScreen(viewModel = settingsViewModel, navController = navController)
+        }
     }
 }

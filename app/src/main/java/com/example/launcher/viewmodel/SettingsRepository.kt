@@ -24,6 +24,9 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
 
         // Greyscale app icons setting key
         val GREYSCALE_ICONS_KEY = booleanPreferencesKey("grey_scale_app_icons")
+
+        // Dark-mode settings Key
+        val DARK_MODE_KEY = booleanPreferencesKey(("dark_mode"))
     }
 
     val maxDockSize: Flow<Int> = context.dataStore.data.map { preferences ->
@@ -49,5 +52,9 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
             val currentValue = preferences[GREYSCALE_ICONS_KEY] ?: false // Current value, default to false
             preferences[GREYSCALE_ICONS_KEY] = !currentValue // store Inverse current value
         }
+    }
+
+    val isDarkModeEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[DARK_MODE_KEY] ?: false
     }
 }

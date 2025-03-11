@@ -143,7 +143,7 @@ fun AppDrawer(
             )
             {
                 Button(
-                    onClick = {viewModel.toggleGreyScaleApps()} ,
+                    onClick = { navController.navigate("settingsScreen") } ,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.DarkGray,  // Black background
                         contentColor = Color.White     // White text and icon
@@ -154,14 +154,14 @@ fun AppDrawer(
                 ) {
 
                         Icon(
-                            painter = painterResource(id = R.drawable.tonality_24),
-                            contentDescription = "Toggle Greyscale",
+                            painter = painterResource(id = R.drawable.settings_24),
+                            contentDescription = "Settings",
                             modifier = Modifier
                                 .size(24.dp)
                                 .padding(4.dp)
                         )
                         Text(
-                            text = "Grey-Scale"
+                            text = "Settings"
                         )
 
                 }
