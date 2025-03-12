@@ -1,6 +1,8 @@
 package com.example.launcher.view
 
 
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
@@ -217,6 +219,13 @@ fun AppDrawer(
             val isExpanded = expandedMenuState[app.packageName] ?: false
             val icon: Drawable = packageManager.getApplicationIcon(app.packageName)
 
+            val isSystemApp = try { // We use this to tell if the app can be uninstalled or not, don't show the uninstall option in the dropdown if so
+                val appInfo = packageManager.getApplicationInfo(app.packageName, 0)
+                (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+            } catch (e: PackageManager.NameNotFoundException) {
+                false
+            }
+
             Box(
                 modifier = Modifier
                     .padding(8.dp)
@@ -257,6 +266,16 @@ fun AppDrawer(
                         expanded = isExpanded,
                         onDismissRequest = { expandedMenuState[app.packageName] = false }
                     ) {
+                        if(!isSystemApp) {
+                            DropdownMenuItem(
+                                text = { Text("Uninstall") },
+                                onClick = {
+                                    viewModel2.deleteApp(app.packageName)
+                                    Log.d("AppDrawer", "Deleting app $app.label")
+                                    expandedMenuState[app.packageName] = false
+                                }
+                            )
+                        }
                         DropdownMenuItem(
                             text = { Text("Dock") },
                             onClick = {

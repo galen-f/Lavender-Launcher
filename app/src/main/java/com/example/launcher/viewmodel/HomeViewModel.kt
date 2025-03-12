@@ -1,7 +1,9 @@
 package com.example.launcher.viewmodel
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
@@ -175,6 +177,29 @@ class HomeViewModel @Inject constructor(
     fun removeFromDock(packageName: String) {
         viewModelScope.launch {
             appDao.removeFromDock(packageName)
+        }
+    }
+
+    fun deleteApp(packageName: String) {
+        viewModelScope.launch {
+            /*
+            Delete the database entry regardless of if the app actually gets uninstalled. As the uninstall api does not return a
+            result code, we cannot know if it actually did get uninstalled without a broadcast receiver.
+            The app will be added back to the database next recomposition if it is not uninstalled.
+
+            This system also does not note system apps, which will have a similar reaction.
+            */
+
+            // Delete the database entry for the app
+            appDao.deleteApp(packageName)
+
+            // Open the system dialog to handle the uninstall
+            val uninstallIntent = Intent(Intent.ACTION_UNINSTALL_PACKAGE).apply {
+                data = Uri.fromParts("package", packageName, null)
+                putExtra(Intent.EXTRA_RETURN_RESULT, true)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            context.startActivity(uninstallIntent)
         }
     }
 
