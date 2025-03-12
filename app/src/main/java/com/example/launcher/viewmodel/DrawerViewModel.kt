@@ -75,6 +75,21 @@ class DrawerViewModel @Inject constructor(
                     null
                 }
             }
+
+            // Remove "stale" apps
+            /* This is necessary because in the case an app was uninstalled without the knowledge
+            of the launcher, the launcher would crash catastrophically as it tried to spawn the
+            package that didn't exist.
+             */
+            val installedPackages = installedApps.map {it.packageName }.toSet()
+            val storedApps = appDao.getAllApps().first()
+            storedApps.forEach { storedApps ->
+                if (!installedPackages.contains(storedApps.packageName)) {
+                    appDao.deleteApp(storedApps.packageName)
+                }
+
+            }
+
             installedApps.forEach { appDao.insertApp(it) }
         }
     }
