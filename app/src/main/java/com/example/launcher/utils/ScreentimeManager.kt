@@ -1,7 +1,6 @@
 package com.example.launcher.utils
 
-import android.app.AlertDialog
-import android.app.usage.UsageStats
+import java.text.DateFormat;
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
@@ -9,41 +8,49 @@ import android.provider.Settings
 import android.util.Log
 import dagger.hilt.android.scopes.ViewModelScoped
 import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import javax.inject.Inject
-import kotlin.math.log
 
 @ViewModelScoped
 class ScreentimeManager @Inject constructor() {
 
     fun getTotalScreenTime(context: Context): Long {
+        /*
+        Usage stats can be extremely touchy. On certain devices it may include services times, as a result
+        you get phantom screen-time notes where the screen-time is duplicated (sometimes I have seen up to 9 copies of an app register)
+        Usually the smallest screen-time is the one which is active foregrounding, but it is impossible to tell with the data
+        given by the manager. As a result there can be some significant inaccuracies but this is the best we can do.
+
+        Also while im ranting, the java.time library doesn't seem to have a .toEpochMillis function
+        anymore, that's why ive gotten millis by just multiplying seconds by 1000 lol
+         */
         val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
 
-        // Launcher apps make screentime look way higher than it actually is because they run in the background so we have to ignore it
+        // Launcher apps make screen-time look way higher than it actually is because they run in the background so we have to ignore it
         // Get the launcher app package info
         val launcherPackage = getHomePackages(context)
 
-        val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        val startTime = calendar.timeInMillis // milliseconds from 1970 to midnight the day of today
-
-        val endTime = System.currentTimeMillis() // Milliseconds from 1970 to the current time
+        val zoneId = ZoneId.systemDefault()
+        val startTime = ZonedDateTime.now(zoneId).toLocalDate().atStartOfDay(zoneId).toEpochSecond()*1000
+        val endTime = System.currentTimeMillis()
 
 //        logApps(context)
 
         val usageStatsList = usageStatsManager.queryUsageStats(
-            UsageStatsManager.INTERVAL_BEST,
+            UsageStatsManager.INTERVAL_DAILY,
             startTime,
             endTime
         ) ?: return 0
 
-        return usageStatsList
-            .filter {it.packageName !in launcherPackage } // Ignore the launcher app
-            .sumOf { it.totalTimeInForeground } // Sum up the time
+        val accurateUsage = usageStatsList.groupBy { it.packageName }.mapValues { (_, stats) ->
+            //pick the record of that package with the smallest screen-time (filters out phantom screen-times in some devices)
+            stats.minByOrNull { it.totalTimeInForeground }?.totalTimeInForeground ?: 0L
+        }
+
+        return accurateUsage
+            .values.sum()
     }
 
     fun hasUsageAccess(context: Context): Boolean { // Check if the app has usage permissions
@@ -68,41 +75,44 @@ class ScreentimeManager @Inject constructor() {
         context.startActivity(intent)
     }
 
-    // Function which returns a list of the top 50 apps, commented out but kept in case I want to display the top used apps
+    // Function which returns a list of the top 50 apps, commented out but kept in case I want to display the top used apps (mostly for debugging)
     private fun logApps(context: Context) {
         val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
 
-
-        // Get start time (midnight today)
-        val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        val startTime = calendar.timeInMillis
+        val zoneId = ZoneId.systemDefault()
+        val startTime = ZonedDateTime.now(zoneId).toLocalDate().atStartOfDay(zoneId).toEpochSecond()*1000
         val endTime = System.currentTimeMillis()
 
         // Query usage stats
         val usageStatsList = usageStatsManager.queryUsageStats(
-            UsageStatsManager.INTERVAL_BEST,
+            UsageStatsManager.INTERVAL_DAILY,
             startTime,
             endTime
         ) ?: return
 
+        val formattedStartDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(startTime))
+        val formattedEndDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(endTime))
+
+        val accurateUsage = usageStatsList.groupBy { it.packageName }.mapValues { (_, stats) ->
+            //pick the record of that package with the smallest screen-time (filters out phantom screen-times in some devices)
+            stats.minByOrNull { it.totalTimeInForeground }?.totalTimeInForeground ?: 0L
+        }
+
+
         // Sort by foreground time in descending order
-        val sortedUsageStats = usageStatsList
-            .sortedByDescending { it.totalTimeInForeground } // Sort from most to least used
+        val sortedUsageStats = accurateUsage.toList().sortedByDescending { (_, time) -> time }
+//            .sortedByDescending { it.totalTimeInForeground } // Sort from most to least used
 
         // Get the top 3 apps
-        val topApps = sortedUsageStats.take(50)
+        val topApps = sortedUsageStats
+            .take(50)
 
         // Log the top 3 apps
         val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        Log.d("ScreentimeManager","Checking screentime between $formattedStartDate and $formattedEndDate")
         Log.d("ScreentimeManager", "Top apps used today:")
-        topApps.forEachIndexed { index, usageStats ->
-            val packageName = usageStats.packageName
-            val minutesUsed = usageStats.totalTimeInForeground / (1000 * 60) // Convert milliseconds to minutes
+        topApps.forEachIndexed { index, (packageName, timeInForeground) ->
+            val minutesUsed = timeInForeground / (6000) // Convert milliseconds to minutes
             Log.d("ScreentimeManager", "#${index + 1}: $packageName - $minutesUsed min")
         }
     }
