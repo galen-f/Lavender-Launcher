@@ -8,14 +8,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.launcher.model.AppDao
 import com.example.launcher.model.AppEntity
 import com.example.launcher.model.AppFolderEntity
 import com.example.launcher.model.FolderEntity
 import com.example.launcher.utils.ScreentimeManager
-
-import com.example.launcher.viewmodel.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,10 +30,6 @@ class HomeViewModel @Inject constructor(
     val screentimeManager: ScreentimeManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
-
-    private val _maxDockSize = MutableStateFlow(SettingsRepository.DEFAULT_DOCK_SIZE)
-    val maxDockSize: StateFlow<Int> = _maxDockSize
-
     private val _folders = MutableStateFlow<List<String>>(emptyList())
     val folders: StateFlow<List<String>> = _folders
 
@@ -81,7 +74,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // TODO: Refuse to add duplicate folders
     fun addFolder(folderName: String) {
         viewModelScope.launch {
             appDao.insertFolder(FolderEntity(name = folderName))
@@ -99,9 +91,7 @@ class HomeViewModel @Inject constructor(
                         packageName = packageName
                     )
                 )
-            } else {
-                Log.e("HomeViewModel", "Tried to add app to folder $folderName, but folder was not found")
-            }
+            } else {  Log.e("HomeViewModel", "Tried to add app to folder $folderName, but folder was not found")  }
         }
     }
 
@@ -110,9 +100,7 @@ class HomeViewModel @Inject constructor(
             val folder = appDao.getFolderByName(folderName)
             if (folder != null) {
                 appDao.removeAppFromFolder(packageName, folder.id)
-            } else {
-                Log.e("HomeViewModel", "Tried to remove app from folder, but folder was not found: $folderName")
-            }
+            } else {Log.e("HomeViewModel", "Tried to remove app from folder, but folder was not found: $folderName") }
         }
     }
 
@@ -122,9 +110,7 @@ class HomeViewModel @Inject constructor(
             if (folder != null) {
                 appDao.deleteFolder(folder.id)
                 appDao.deleteFolderApps(folder.id) // Clear memory and delete app relations in the folder
-            } else {
-                Log.e("HomeViewModel", "Tried to remove folder $folderName, but folder was not found")
-            }
+            } else {Log.e("HomeViewModel", "Tried to remove folder $folderName, but folder was not found") }
         }
     }
 
@@ -136,10 +122,7 @@ class HomeViewModel @Inject constructor(
                     Log.d("HomeViewModel", "Apps fetched: ${appEntities.map { it.label }}")
                     _appsInFolder.value = appEntities
                 }
-            } else {
-                Log.e("HomeViewModel", "Tried to display apps in folder $folderName, but folder was not found")
-            }
-
+            } else {Log.e("HomeViewModel", "Tried to display apps in folder $folderName, but folder was not found") }
         }
     }
 
@@ -148,21 +131,15 @@ class HomeViewModel @Inject constructor(
         val intent = pm.getLaunchIntentForPackage(packageName)
         if (intent != null) {
             context.startActivity(intent)
-        } else {
-            Log.e("HomeViewModel", "Tried to launch app $packageName, but app was not found")
-        }
-
+        } else {Log.e("HomeViewModel", "Tried to launch app $packageName, but app was not found") }
     }
 
     // App dock logic
 
     fun addToDock(packageName: String) {
         viewModelScope.launch {
-            Log.d("HomeViewModel", "addToDock called")
             val maxSize = settingsRepository.maxDockSize.first() // Get the dock size from the settings system
-
             val dockSize = appDao.getDockAppCount()
-            Log.d("HomeViewModel", "max size: $maxSize, current size: $dockSize")
 
             if (dockSize >= maxSize ) {
                 Log.d("HomeViewModel", "Current app dock size exceeds maximum: $dockSize")
@@ -186,8 +163,6 @@ class HomeViewModel @Inject constructor(
             Delete the database entry regardless of if the app actually gets uninstalled. As the uninstall api does not return a
             result code, we cannot know if it actually did get uninstalled without a broadcast receiver.
             The app will be added back to the database next recomposition if it is not uninstalled.
-
-            This system also does not note system apps, which will have a similar reaction.
             */
 
             // Delete the database entry for the app
@@ -205,17 +180,15 @@ class HomeViewModel @Inject constructor(
 
     // Screen-time Tracker Logic
 
-    fun fetchScreenTime() {
+    private fun fetchScreenTime() {
         viewModelScope.launch {
             if (!screentimeManager.hasUsageAccess(context)) {
                 Log.e("HomeViewModel", "Usage access permission is not granted.")
                 _showPermissionDialog.value = true
                 return@launch
             }
-
             _screenTime.value = screentimeManager.getTotalScreenTime(context)
             Log.d("HomeViewModel", "Screen-time queried")
         }
     }
-
 }

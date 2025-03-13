@@ -12,7 +12,6 @@ import com.example.launcher.ui.theme.LauncherTheme
 import com.example.launcher.view.AppDrawer
 import com.example.launcher.view.HomeScreen
 import com.example.launcher.view.SettingsScreen
-
 import dagger.hilt.android.AndroidEntryPoint
 
 // Navigation Support Libraries
@@ -28,6 +27,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            // ViewModels are initialised outside of the navcontroller because dagger and
+            // navcontroller don't play nice, initializing them inside will cause massive recompositions
             val navController = rememberNavController()
             val homeViewModel: HomeViewModel = hiltViewModel()
             val drawerViewModel: DrawerViewModel = hiltViewModel()

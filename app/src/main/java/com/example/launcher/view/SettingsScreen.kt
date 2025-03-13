@@ -1,7 +1,6 @@
 package com.example.launcher.view
 
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -40,27 +38,26 @@ fun SettingsScreen(
     val isGreyScale by viewModel.greyScaledApps.collectAsState()
     val dockSize by viewModel.maxDockSize.collectAsState(initial = SettingsRepository.DEFAULT_DOCK_SIZE)
 
-    Box(
+    Box( // The background
         modifier = Modifier
             .fillMaxSize()
             .background(
-                color = MaterialTheme.colorScheme.background.copy(alpha = 0.8F)
-            ) // BG color and transparency value.
+                color = MaterialTheme.colorScheme.background.copy(alpha = 0.8F) // BG color and transparency value.
+            )
     )
     {
         Column(
             modifier = Modifier
                 .padding(48.dp)
         ) {
-            Text(
+            Text( // Title
                 text = "Settings",
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Dark Mode Toggle
-            Row(
+            Row( // Dark Mode Toggle
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -82,7 +79,7 @@ fun SettingsScreen(
                 ) {
 
                     Icon(
-                        painter = painterResource(id = R.drawable.dark_mode_24),
+                        painter = painterResource(id = R.drawable.dark_mode_24), // I got the icons from https://fonts.google.com/icons
                         contentDescription = "Dark-mode Button",
                         modifier = Modifier
                             .size(24.dp)
@@ -95,9 +92,7 @@ fun SettingsScreen(
                 }
             }
 
-
-            // Greyscale Apps Toggle
-            Row(
+            Row( // Greyscale Apps Toggle
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -120,7 +115,7 @@ fun SettingsScreen(
                 ) {
 
                     Icon(
-                        painter = painterResource(id = R.drawable.tonality_24),
+                        painter = painterResource(id = R.drawable.tonality_24), // I got the icons from https://fonts.google.com/icons
                         contentDescription = "Toggle Grey-scaled apps",
                         modifier = Modifier
                             .size(24.dp)
@@ -149,7 +144,7 @@ fun SettingsScreen(
                 modifier = Modifier.padding(top = 8.dp)
             )
 
-            // Button to return to previous screen
+            // Button to return to previous screen, because this is still considered a launcher app, the home button does not send you home (as you technically are still home in the settings screen)
             Button(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier

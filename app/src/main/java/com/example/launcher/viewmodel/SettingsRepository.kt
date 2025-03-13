@@ -39,8 +39,6 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
         }
     }
 
-    // Grey-scale app icons settings
-
     // Flow to observe the grey-scale app icons setting
     val isGreyScaleIconsEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[GREYSCALE_ICONS_KEY] ?: false

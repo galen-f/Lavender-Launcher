@@ -45,8 +45,7 @@ fun FolderList(viewModel: HomeViewModel) {
 
     var expandedFolder by remember { mutableStateOf<String?>(null) } // Track which folder is expanded
 
-
-    folders.forEach { folder ->
+    folders.forEach { folder -> // List of all folders the user has created, stored in the database
         var showFolderMenu by remember { mutableStateOf(false) }
 
         val folderModifier =
@@ -60,16 +59,15 @@ fun FolderList(viewModel: HomeViewModel) {
                 Modifier
             }
 
-        Column( // folder names column
+        Column( // Column of folders
             modifier = folderModifier,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text( // Folder Label
+            Text( // Folder Label (name/title)
                 text = folder,
                 style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
                     .padding(8.dp)
                     .combinedClickable(
                         onClick = {
@@ -86,7 +84,7 @@ fun FolderList(viewModel: HomeViewModel) {
                 overflow = TextOverflow.Ellipsis
             )
 
-            // Press and hold folder to show this menu (Allows use to delete the folder)
+            // Press and hold on the folder to show this menu (Allows use to delete the folder)
             DropdownMenu(
                 expanded = showFolderMenu,
                 onDismissRequest = { showFolderMenu = false }
@@ -94,9 +92,7 @@ fun FolderList(viewModel: HomeViewModel) {
                 DropdownMenuItem(
                     text = { Text("Remove folder") },
                     onClick = {
-                        viewModel.removeFolder(
-                            folder
-                        )
+                        viewModel.removeFolder(folder)
                         showFolderMenu = false
                     }
                 )
@@ -110,6 +106,7 @@ fun FolderList(viewModel: HomeViewModel) {
     }
 }
 
+// This is what is inside the folder
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FolderItem(viewModel: HomeViewModel, folder: String) {
@@ -117,7 +114,7 @@ fun FolderItem(viewModel: HomeViewModel, folder: String) {
     val context = LocalContext.current
     val packageManager = context.packageManager
 
-    val greyscaleMatrix = ColorMatrix().apply { setToSaturation(0f) }
+    val greyscaleMatrix = ColorMatrix().apply { setToSaturation(0f) } // Used for greyscale apps setting
     val greyScale by viewModel.greyScaledApps.collectAsState()
 
     Column(
@@ -127,10 +124,10 @@ fun FolderItem(viewModel: HomeViewModel, folder: String) {
             .padding(8.dp),
     ) {
         LazyVerticalGrid(
-            // Grid designates the locations of the apps inside the folder
-            columns = GridCells.Fixed(3),
+            // Grid of apps in the folder
+            columns = GridCells.Fixed(3), // how many apps across in a folder
         ) {
-            items(appsInFolder) { app ->
+            items(appsInFolder) { app -> // App items
                 var showMenu by remember { mutableStateOf(false) } // For delete menu
                 val icon: Drawable =
                     packageManager.getApplicationIcon(app.packageName)
@@ -160,7 +157,7 @@ fun FolderItem(viewModel: HomeViewModel, folder: String) {
                         )
                         Text( // App Label
                             text = app.label,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleSmall,
                             textAlign = TextAlign.Center,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -168,7 +165,7 @@ fun FolderItem(viewModel: HomeViewModel, folder: String) {
                             modifier = Modifier
                                 .fillMaxWidth()
                         )
-                        DropdownMenu(
+                        DropdownMenu( // Menu which allows the user to remove an app from a folder
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false }
                         ) {

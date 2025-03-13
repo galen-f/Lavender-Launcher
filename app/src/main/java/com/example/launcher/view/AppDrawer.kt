@@ -65,7 +65,7 @@ import com.google.accompanist.drawablepainter.DrawablePainter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AppDrawer(
     navController: NavController,
@@ -87,37 +87,39 @@ fun AppDrawer(
     //Cache app icons
     val iconCache = remember { mutableMapOf<String, Drawable>() }
 
-    // State for the search query
+    // State for the search bar
     var searchQuery by remember { mutableStateOf("") }
 
-    // Derive a filtered list of apps based on the query.
-    // If the query is blank, show all apps.
+    // Derive a filtered list of apps based on the searchbar query.
+    // If the search query is blank, show all apps.
     val filteredApps = if (searchQuery.isBlank()) {
         apps
     } else {
         apps.filter { it.label.contains(searchQuery, ignoreCase = true) }
     }
 
-    val totalWidth = with(density) { configuration.screenWidthDp.dp.toPx() } // Screen width
-    val duration = 300 // Animation speed in ms
-    val animationSpec = tween<Float>(duration) // Animation when returning
-    val decaySpec = rememberSplineBasedDecay<Float>() // Physics based decay
+    // Following is the stuff related to making a smooth "swipe" system to go to another page
+    val totalWidth = with(density) { configuration.screenWidthDp.dp.toPx() }    // Screen width
+    val duration = 300                                                          // Animation speed in ms
+    val animationSpec = tween<Float>(duration)                                  // Animation when returning
+    val decaySpec = rememberSplineBasedDecay<Float>()                           // Physics based decay
     val anchors = DraggableAnchors {
-        0 at 0f // Default position anchor
-        1 at -totalWidth // Right swipe anchor
-        2 at totalWidth // Left swipe anchor
+        0 at 0f                                                                 // Default position anchor
+        1 at -totalWidth                                                        // Right swipe anchor
+        2 at totalWidth                                                         // Left swipe anchor
     }
 
+    // Define the anchors and swipe conditions for navigation
     val offsetX by remember { mutableStateOf(0f) }
     val draggableState = remember {
         AnchoredDraggableState(
          initialValue = 0,
          anchors = anchors,
-         positionalThreshold = { totalWidth * 0.4f }, // 40% of screen to swipe
-         velocityThreshold = { with(density) { 125.dp.toPx() } }, //Fling speed
-         snapAnimationSpec = animationSpec, // Animation when releasing mid-swipe
-         decayAnimationSpec = decaySpec, // Fling animation
-         confirmValueChange = { true } // Always allow swiping
+         positionalThreshold = { totalWidth * 0.4f },               // 40% of screen to swipe
+         velocityThreshold = { with(density) { 125.dp.toPx() } },   //Fling speed
+         snapAnimationSpec = animationSpec,                         // Animation when releasing mid-swipe
+         decayAnimationSpec = decaySpec,                            // Fling animation
+         confirmValueChange = { true }                              // Always allow swiping
         )
     }
 
@@ -131,19 +133,19 @@ fun AppDrawer(
     LaunchedEffect(offsetX) {
         snapshotFlow { draggableState.targetValue }
             .collect { target ->
-                if (target == 1 || target == 2) { // If swiped left or right
-                    navController.navigate("homeScreen") // Go to homescreen
+                if (target == 1 || target == 2) {               // If swiped left or right
+                    navController.navigate("homeScreen")  // Go to homescreen
                 }
             }
     }
 
-    // Layout for basic drawer interface
+    // Layout for basic drawer interface, this holds everything (searchbar, settings, title, apps)
     LazyVerticalGrid(
         columns = GridCells.Fixed(2), // # items per row
         modifier = Modifier
             .background(
                 color = MaterialTheme.colorScheme.background.copy(alpha = 0.8F)
-            ) // BG color and transparency value.
+            )
             .padding(bottom = 20.dp)
             .fillMaxSize()
             .graphicsLayer { translationX = animatedOffsetX }
@@ -159,18 +161,18 @@ fun AppDrawer(
         item(span = { GridItemSpan(2) }) { // Span across 2 columns, hols settings button and apps label
             Box(
                 modifier = Modifier
-                    .padding(
+                    .padding( // Padding around title and settings
                         16.dp,
                         bottom = 32.dp,
                         top = 64.dp
-                    ) // Padding around title and settings
+                    )
             )
             {
-                Button(
+                Button( // This is the button that brings you to the settings screen, I wasn't sure if I should make this a new page or do this
                     onClick = { navController.navigate("settingsScreen") } ,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,  // Black background
-                        contentColor = MaterialTheme.colorScheme.onPrimary     // White text and icon
+                        containerColor = MaterialTheme.colorScheme.primary,     // Black background
+                        contentColor = MaterialTheme.colorScheme.onPrimary      // White text and icon
                     ),
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
@@ -178,7 +180,7 @@ fun AppDrawer(
                 ) {
 
                         Icon(
-                            painter = painterResource(id = R.drawable.settings_24),
+                            painter = painterResource(id = R.drawable.settings_24), // I got the icons from https://fonts.google.com/icons
                             contentDescription = "Settings",
                             modifier = Modifier
                                 .size(24.dp)
@@ -189,7 +191,7 @@ fun AppDrawer(
                         )
 
                 }
-                Text(
+                Text( // This is the title item, next to the settings button
                     text = "Apps",
                     style = MaterialTheme.typography.displayMedium,
                     modifier = Modifier
@@ -204,7 +206,7 @@ fun AppDrawer(
 
         item (span = { GridItemSpan(2) }) { // Search Bar
             TextField(
-                value = searchQuery,
+                value = searchQuery, // Send this back up to the top where we filter down the apps to only be apps which include this value
                 onValueChange = { searchQuery = it },
                 label = { Text("Search Apps") },
                 modifier = Modifier
@@ -212,10 +214,11 @@ fun AppDrawer(
             )
         }
 
-        items(filteredApps) { app -> // Only display apps that have been searched for
+        // This is where the "true" lazy grid starts, this shows the apps and icons
+        items(filteredApps) { app -> // Only display apps that have been searched for (filtered apps)
             val isExpanded = expandedMenuState[app.packageName] ?: false
 
-            // Cache the icons, use a background thread using dispatchers. Hopefully this is meant to trigger GC less
+            // Cache the icons, use a background thread using dispatchers. Hopefully this triggers GC less
             val cachedIcon = iconCache[app.packageName]
             LaunchedEffect(app.packageName) {
                 if (cachedIcon == null) {
@@ -227,14 +230,16 @@ fun AppDrawer(
                 }
             }
 
-            val isSystemApp = try { // We use this to tell if the app can be uninstalled or not, don't show the uninstall option in the dropdown if so
+            // Certain apps, like system apps (bloatware lol) cant be uninstalled, for instance the google play store, this bit here notes what apps
+            // those are and makes sure the dropdown menu doesn't display an uninstall button
+            val isSystemApp = try {
                 val appInfo = packageManager.getApplicationInfo(app.packageName, 0)
                 (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
             } catch (e: PackageManager.NameNotFoundException) {
                 false
             }
 
-            Box(
+            Box( // This is the actual "app"
                 modifier = Modifier
                     .padding(8.dp)
                     .size(64.dp)
@@ -256,10 +261,10 @@ fun AppDrawer(
                             contentDescription = "${app.label} icon",
                             colorFilter = if (greyScale) ColorFilter.colorMatrix(greyscaleMatrix) else null,
                             modifier = Modifier
-                                .size(50.dp) // Icon Size
-                                .padding(end = 12.dp) // Space between icon and text
+                                .size(50.dp)            // Icon Size
+                                .padding(end = 12.dp)   // Space between icon and text
                         )
-                    } else { // Show a placeholder box that's the same size as the icon
+                    } else { // Show a placeholder box that's the same size as the icon if the icon hasn't been loaded (prevents lag when loading icons)
                         Box(
                             modifier = Modifier
                                 .size(50.dp)
@@ -279,12 +284,12 @@ fun AppDrawer(
                         modifier = Modifier
                             .fillMaxWidth()
                     )
-                    DropdownMenu(
+                    DropdownMenu( // This dropdown menu allows users to uninstall apps, move them to folders, or to the app dock
                         expanded = isExpanded,
                         onDismissRequest = { expandedMenuState[app.packageName] = false }
                     ) {
                         if(!isSystemApp) {
-                            DropdownMenuItem(
+                            DropdownMenuItem( // Uninstall app button
                                 text = { Text("Uninstall") },
                                 onClick = {
                                     homeViewModel.deleteApp(app.packageName)
@@ -293,7 +298,7 @@ fun AppDrawer(
                                 }
                             )
                         }
-                        DropdownMenuItem(
+                        DropdownMenuItem( // Add to the app dock on the homescreen
                             text = { Text("Dock") },
                             onClick = {
                                 homeViewModel.addToDock(app.packageName)
@@ -301,8 +306,8 @@ fun AppDrawer(
                                 expandedMenuState[app.packageName] = false
                             }
                         )
-                        folders.forEach { folder ->
-                            DropdownMenuItem(
+                        folders.forEach { folder -> // Display list of folders that have been added to the home screen
+                            DropdownMenuItem(  // Allow users to click on those folders to add it to that folder
                                 text = { Text(folder) },
                                 onClick = {
                                     homeViewModel.addAppToFolder(app.packageName, folder)

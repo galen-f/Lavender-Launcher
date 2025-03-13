@@ -1,6 +1,5 @@
 package com.example.launcher.utils
 
-import java.text.DateFormat;
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
@@ -28,7 +27,8 @@ class ScreentimeManager @Inject constructor() {
          */
         val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
 
-        // Launcher apps make screen-time look way higher than it actually is because they run in the background so we have to ignore it
+        // I dont actually use this in the current build but in case I want to filter out launcher apps, this does that
+        // During development I did this but im not sure it was the best feature, kept it in in case I change my mind
         // Get the launcher app package info
         val launcherPackage = getHomePackages(context)
 

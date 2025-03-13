@@ -1,7 +1,5 @@
 package com.example.launcher.view
 
-import androidx.compose.material3.AlertDialog
-
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.rememberSplineBasedDecay
@@ -12,19 +10,22 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheetDefaults.properties
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,18 +40,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.launcher.viewmodel.HomeViewModel
 
@@ -68,26 +66,28 @@ fun HomeScreen(
     val configuration = LocalConfiguration.current
     val showPermissionDialog = viewModel.showPermissionDialog.collectAsState()
 
-    val totalWidth = with(density) { configuration.screenWidthDp.dp.toPx() } // Screen width
-    val duration = 300 // Animation speed in ms
-    val animationSpec = tween<Float>(duration) // Animation when returning
-    val decaySpec = rememberSplineBasedDecay<Float>() // Physics based decay
+    // Following is the logic to handle swipe based navigation
+    val totalWidth = with(density) { configuration.screenWidthDp.dp.toPx() }    // Screen width
+    val duration = 300                                                          // Animation speed in ms
+    val animationSpec = tween<Float>(duration)                                  // Animation when returning
+    val decaySpec = rememberSplineBasedDecay<Float>()                           // Physics based decay
     val anchors = DraggableAnchors {
-        0 at 0f // Default position anchor
-        1 at -totalWidth // Right swipe anchor
-        2 at totalWidth // Left swipe anchor
+        0 at 0f                                                                 // Default position anchor
+        1 at -totalWidth                                                        // Right swipe anchor
+        2 at totalWidth                                                         // Left swipe anchor
     }
 
+    // Defines the anchors for the swipe based navigation
     val offsetX by remember { mutableStateOf(0f) }
     val draggableState = remember {
         AnchoredDraggableState(
             initialValue = 0,
             anchors = anchors,
-            positionalThreshold = { totalWidth * 0.4f }, // 40% of screen to swipe
-            velocityThreshold = { with(density) { 125.dp.toPx() } }, //Fling speed
-            snapAnimationSpec = animationSpec, // Animation when releasing mid-swipe
-            decayAnimationSpec = decaySpec, // Fling animation
-            confirmValueChange = { true } // Always allow swiping
+            positionalThreshold = { totalWidth * 0.4f },                // 40% of screen to swipe
+            velocityThreshold = { with(density) { 125.dp.toPx() } },    //Fling speed
+            snapAnimationSpec = animationSpec,                          // Animation when releasing mid-swipe
+            decayAnimationSpec = decaySpec,                             // Fling animation
+            confirmValueChange = { true }                               // Always allow swiping
         )
     }
 
@@ -115,7 +115,7 @@ fun HomeScreen(
                 state = draggableState,
                 orientation = Orientation.Horizontal,
             )
-            .pointerInput(Unit) {
+            .pointerInput(Unit) { // Press anywhere in the background to make a new folder
                 detectTapGestures(onLongPress = {
                     showInputDialog = true // Trigger folder creation dialog
                 })
@@ -155,17 +155,17 @@ fun HomeScreen(
 
     }
 
-    // On long-press, show the add folder modal
-    if (showInputDialog) { // If user wants to create a new folder
+    // If long press detection is heard, show the add folder modal
+    if (showInputDialog) {
         FolderAddDialog(viewModel, onDismiss = { showInputDialog = false })
     }
 
     // TODO: This will prompt every time the user opens the app even if they deny it
-    if (showPermissionDialog.value) {
+    if (showPermissionDialog.value) { // Permissions dialog, the screen-time tracker cant work without these permissions
         AlertDialog(
             onDismissRequest = { viewModel.setPermissionDialogState(false) },
-            title = { Text("Permission Required") },
-            text = { Text("This app needs permission to access screen time. Please enable it in settings.") },
+            title = { Text("Usage Stats Permission Required") },
+            text = { Text("The launcher app needs permission to access screen time in order to show your daily screen-time estimate. Please enable it in settings.") },
             confirmButton = {
                 Button(onClick = {
                     viewModel.setPermissionDialogState(false)
@@ -206,14 +206,12 @@ fun FolderAddDialog(viewModel: HomeViewModel, onDismiss: () -> Unit) {
                 Text(
                     text = "Create new folder"
                 )
-                OutlinedTextField(
+                OutlinedTextField( // Field to make a new folder
                     value = newFolderName,
                     onValueChange = { newFolderName = it },
                     label = { Text("Folder Name")}
                 )
-
-                Row(
-
+                Row( // buttons
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text("Cancel")
@@ -236,7 +234,7 @@ fun FolderAddDialog(viewModel: HomeViewModel, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun ScreenTimeTracker(viewModel: HomeViewModel) {
+fun ScreenTimeTracker(viewModel: HomeViewModel) { // This is really bad but gets the message across best I can, check screen time manager for more info
     val screenTime by viewModel.screenTime.collectAsState()
 
     val hours = screenTime / (1000 * 60 * 60) // Two variables to help distinguish between hours and minutes, could be improved to only display hours when needed
