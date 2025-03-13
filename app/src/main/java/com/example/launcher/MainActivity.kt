@@ -1,15 +1,12 @@
 package com.example.launcher
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.launcher.ui.theme.LauncherTheme
 import com.example.launcher.view.AppDrawer
@@ -17,7 +14,6 @@ import com.example.launcher.view.HomeScreen
 import com.example.launcher.view.SettingsScreen
 
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
 
 // Navigation Support Libraries
 import androidx.navigation.compose.NavHost
@@ -26,9 +22,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.launcher.viewmodel.DrawerViewModel
 import com.example.launcher.viewmodel.SettingsViewModel
 import com.example.launcher.viewmodel.HomeViewModel
-
-// TODO: Broadcast receiver for (un)installed apps
-// TODO: Workmanager for screen-time tracker
 
 @AndroidEntryPoint // HILT
 class MainActivity : ComponentActivity() {
@@ -59,7 +52,7 @@ fun LauncherNavHost(
     NavHost(navController = navController, startDestination = "HomeScreen") {
         composable("appDrawer", arguments = emptyList()) {
             // HILT Injection
-            AppDrawer(viewModel = drawerViewModel, viewModel2 = homeViewModel, navController = navController)
+            AppDrawer(drawerViewModel = drawerViewModel, homeViewModel = homeViewModel, navController = navController)
         }
         composable("homeScreen", arguments = emptyList()) {
             // HILT Injection
