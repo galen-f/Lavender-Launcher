@@ -17,7 +17,6 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,25 +34,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.graphicsLayer
@@ -61,7 +54,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -70,25 +62,30 @@ import com.example.launcher.R
 import com.example.launcher.viewmodel.DrawerViewModel
 import com.example.launcher.viewmodel.HomeViewModel
 import com.google.accompanist.drawablepainter.DrawablePainter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AppDrawer(
     navController: NavController,
-    viewModel: DrawerViewModel,
-    viewModel2: HomeViewModel
+    drawerViewModel: DrawerViewModel,
+    homeViewModel: HomeViewModel
 ) {
 
     // Get apps list from DrawerViewModel
-    val apps by viewModel.apps.collectAsState()
-    val greyScale by viewModel.greyScaledApps.collectAsState()
-    val folders by viewModel2.folders.collectAsState()
+    val apps by drawerViewModel.apps.collectAsState()
+    val greyScale by drawerViewModel.greyScaledApps.collectAsState()
+    val folders by homeViewModel.folders.collectAsState()
     val context = LocalContext.current
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
     val packageManager = context.packageManager
     val expandedMenuState = remember { mutableStateMapOf<String, Boolean>() } // Remember the dropdown (better for performance to be out here)
     val greyscaleMatrix = ColorMatrix().apply { setToSaturation(0f) }
+
+    //Cache app icons
+    val iconCache = remember { mutableMapOf<String, Drawable>() }
 
     // State for the search query
     var searchQuery by remember { mutableStateOf("") }
@@ -217,7 +214,18 @@ fun AppDrawer(
 
         items(filteredApps) { app -> // Only display apps that have been searched for
             val isExpanded = expandedMenuState[app.packageName] ?: false
-            val icon: Drawable = packageManager.getApplicationIcon(app.packageName)
+
+            // Cache the icons, use a background thread using dispatchers. Hopefully this is meant to trigger GC less
+            val cachedIcon = iconCache[app.packageName]
+            LaunchedEffect(app.packageName) {
+                if (cachedIcon == null) {
+                    // laod the icon in a background thread
+                    val loadedIcon = withContext(Dispatchers.IO) {
+                        packageManager.getApplicationIcon(app.packageName)
+                    }
+                    iconCache[app.packageName] = loadedIcon
+                }
+            }
 
             val isSystemApp = try { // We use this to tell if the app can be uninstalled or not, don't show the uninstall option in the dropdown if so
                 val appInfo = packageManager.getApplicationInfo(app.packageName, 0)
@@ -234,7 +242,7 @@ fun AppDrawer(
                 Row( // Responsible for the organization inside the box
                     modifier = Modifier
                         .combinedClickable(
-                            onClick = { viewModel.launchApp(app.packageName) },
+                            onClick = { drawerViewModel.launchApp(app.packageName) },
                             onLongClick = { expandedMenuState[app.packageName] = !isExpanded }
                         )
                         .padding(20.dp),
@@ -242,14 +250,23 @@ fun AppDrawer(
                 )
                 {
                     // Display app icon
-                    Image(
-                        painter = DrawablePainter(icon), // This is the use of the accompanist library, which is shit, just an fyi, took my almost two days to get working
-                        contentDescription = "${app.label} icon",
-                        colorFilter = if (greyScale) ColorFilter.colorMatrix(greyscaleMatrix) else null,
-                        modifier = Modifier
-                            .size(50.dp) // Icon Size
-                            .padding(end = 12.dp) // Space between icon and text
-                    )
+                    if (cachedIcon != null) { // Show icon if its been loaded
+                        Image(
+                            painter = DrawablePainter(cachedIcon), // This is the use of the accompanist library, which is shit, just an fyi, took my almost two days to get working
+                            contentDescription = "${app.label} icon",
+                            colorFilter = if (greyScale) ColorFilter.colorMatrix(greyscaleMatrix) else null,
+                            modifier = Modifier
+                                .size(50.dp) // Icon Size
+                                .padding(end = 12.dp) // Space between icon and text
+                        )
+                    } else { // Show a placeholder box that's the same size as the icon
+                        Box(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .background(MaterialTheme.colorScheme.surface)
+                        )
+                    }
+
 
                     // Display app text
                     Text(
@@ -270,7 +287,7 @@ fun AppDrawer(
                             DropdownMenuItem(
                                 text = { Text("Uninstall") },
                                 onClick = {
-                                    viewModel2.deleteApp(app.packageName)
+                                    homeViewModel.deleteApp(app.packageName)
                                     Log.d("AppDrawer", "Deleting app $app.label")
                                     expandedMenuState[app.packageName] = false
                                 }
@@ -279,7 +296,7 @@ fun AppDrawer(
                         DropdownMenuItem(
                             text = { Text("Dock") },
                             onClick = {
-                                viewModel2.addToDock(app.packageName)
+                                homeViewModel.addToDock(app.packageName)
                                 Log.d("AppDrawer", "add to app dock button clicked")
                                 expandedMenuState[app.packageName] = false
                             }
@@ -288,7 +305,7 @@ fun AppDrawer(
                             DropdownMenuItem(
                                 text = { Text(folder) },
                                 onClick = {
-                                    viewModel2.addAppToFolder(app.packageName, folder)
+                                    homeViewModel.addAppToFolder(app.packageName, folder)
                                     expandedMenuState[app.packageName] = false
                                 }
                             )
