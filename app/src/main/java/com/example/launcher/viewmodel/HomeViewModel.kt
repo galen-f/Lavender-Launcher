@@ -143,7 +143,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun confirmLaunch() { // When suer confirms they want to open the app
-        _pendingLaunchApp.value?.let { preLaunchApp(it) }
+        _pendingLaunchApp.value?.let { launchApp(it) }
         _pendingLaunchApp.value = null
     }
 
