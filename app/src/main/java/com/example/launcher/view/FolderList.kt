@@ -140,7 +140,7 @@ fun FolderItem(viewModel: HomeViewModel, folder: String) {
                     Column( // Column designating the icon to be drawn above the label
                         modifier = Modifier
                             .combinedClickable(
-                                onClick = { viewModel.launchApp(app.packageName) },
+                                onClick = { viewModel.preLaunchApp(app.packageName) },
                                 onLongClick = { showMenu = true }
                             ), // Launch app on click
                         horizontalAlignment = Alignment.CenterHorizontally

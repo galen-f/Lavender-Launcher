@@ -29,6 +29,10 @@ class DrawerViewModel @Inject constructor(
     private val _apps = MutableStateFlow<List<AppEntity>>(emptyList())
     val apps: StateFlow<List<AppEntity>> = _apps
 
+    // Put the app the user wants to launch here, used for high friction mode
+    val _pendingLaunchApp = MutableStateFlow<String?>(null)
+    val pendingLaunchApp: StateFlow<String?> = _pendingLaunchApp
+
     val greyScaledApps: StateFlow<Boolean> = settingsRepository.isGreyScaleIconsEnabled
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
@@ -74,6 +78,27 @@ class DrawerViewModel @Inject constructor(
             }
             installedApps.forEach { appDao.insertApp(it) }
         }
+    }
+
+    fun preLaunchApp(packageName: String) {
+        viewModelScope.launch {
+            // If high friction is enabled, forward to a dialog box
+            if (settingsRepository.isHighFriction.first()) {
+                _pendingLaunchApp.value = packageName
+            } else {
+                // if high friction is not enabled, just launch the app
+                launchApp(packageName)
+            }
+        }
+    }
+
+    fun confirmLaunch() { // When suer confirms they want to open the app
+        _pendingLaunchApp.value?.let { launchApp(it) }
+        _pendingLaunchApp.value = null
+    }
+
+    fun cancelLaunch() { // Call when user decides not to open app
+        _pendingLaunchApp.value = null
     }
 
     // Start apps if they get clicked

@@ -39,6 +39,10 @@ class HomeViewModel @Inject constructor(
     private val _dockApps = MutableStateFlow<List<AppEntity>>(emptyList())
     val dockApps: StateFlow<List<AppEntity>> = _dockApps
 
+    // Put the app the user wants to launch here, used for high friction mode
+    val _pendingLaunchApp = MutableStateFlow<String?>(null)
+    val pendingLaunchApp: StateFlow<String?> = _pendingLaunchApp
+
     val greyScaledApps: StateFlow<Boolean> = settingsRepository.isGreyScaleIconsEnabled
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
@@ -125,6 +129,28 @@ class HomeViewModel @Inject constructor(
             } else {Log.e("HomeViewModel", "Tried to display apps in folder $folderName, but folder was not found") }
         }
     }
+
+    fun preLaunchApp(packageName: String) {
+        viewModelScope.launch {
+            // If high friction is enabled, forward to a dialog box
+            if (settingsRepository.isHighFriction.first()) {
+                _pendingLaunchApp.value = packageName
+            } else {
+                // if high friction is not enabled, just launch the app
+                launchApp(packageName)
+            }
+        }
+    }
+
+    fun confirmLaunch() { // When suer confirms they want to open the app
+        _pendingLaunchApp.value?.let { preLaunchApp(it) }
+        _pendingLaunchApp.value = null
+    }
+
+    fun cancelLaunch() { // Call when user decides not to open app
+        _pendingLaunchApp.value = null
+    }
+
 
     fun launchApp(packageName: String) {
         val pm: PackageManager = context.packageManager

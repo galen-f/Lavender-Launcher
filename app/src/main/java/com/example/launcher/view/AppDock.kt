@@ -70,7 +70,7 @@ fun AppDock(viewModel: HomeViewModel) {
                         Column(
                             modifier = Modifier
                                 .combinedClickable(
-                                    onClick = { viewModel.launchApp(app.packageName) },
+                                    onClick = { viewModel.preLaunchApp(app.packageName) },
                                     onLongClick = { showMenu = true }
                                 )
                                 .padding(8.dp),

@@ -1,6 +1,7 @@
 package com.example.launcher.view
 
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ fun SettingsScreen(
     // Observe settings state
     val isDarkMode by viewModel.darkMode.collectAsState()
     val isGreyScale by viewModel.greyScaledApps.collectAsState()
+    val isHighFriction by viewModel.isHighFriction.collectAsState()
     val dockSize by viewModel.maxDockSize.collectAsState(initial = SettingsRepository.DEFAULT_DOCK_SIZE)
 
     Box( // The background
@@ -87,6 +89,43 @@ fun SettingsScreen(
                     )
                     Text(
                         text = "Dark-mode"
+                    )
+
+                }
+            }
+
+            Row( // High-Friction mode button
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Toggle High-Friction Mode",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .weight(1f)
+                )
+                Button(
+                    onClick = { viewModel.toggleHighFriction()
+                              Log.d("Settings", "High-Friction Mode Enabled: $isHighFriction")
+                              },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .alpha(if (isHighFriction) 1f else 0.5f) // dim the button if dark mode is off
+                ) {
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.psychology_24), // I got the icons from https://fonts.google.com/icons
+                        contentDescription = "High-Friction Mode Button",
+                        modifier = Modifier
+                            .size(24.dp)
+                            .padding(4.dp)
+                    )
+                    Text(
+                        text = "High-Friction"
                     )
 
                 }

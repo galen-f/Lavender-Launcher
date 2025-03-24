@@ -35,12 +35,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateMapOf
@@ -76,6 +78,7 @@ fun AppDrawer(
     // Get apps list from DrawerViewModel
     val apps by drawerViewModel.apps.collectAsState()
     val greyScale by drawerViewModel.greyScaledApps.collectAsState()
+    val pendingApp by drawerViewModel.pendingLaunchApp.collectAsState()
     val folders by homeViewModel.folders.collectAsState()
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -137,6 +140,25 @@ fun AppDrawer(
                     navController.navigate("homeScreen")  // Go to homescreen
                 }
             }
+    }
+
+    // If a launch is pending, show the confirmation dialog
+    if (pendingApp != null) {
+        AlertDialog(
+            onDismissRequest = { drawerViewModel.cancelLaunch() },
+            title = { Text("Confirm App Launch") },
+            text = { Text("Are you sure you want to open this app?") },
+            confirmButton = {
+                TextButton(onClick = { drawerViewModel.confirmLaunch() }) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { drawerViewModel.cancelLaunch() }) {
+                    Text("No")
+                }
+            }
+        )
     }
 
     // Layout for basic drawer interface, this holds everything (searchbar, settings, title, apps)
@@ -247,7 +269,7 @@ fun AppDrawer(
                 Row( // Responsible for the organization inside the box
                     modifier = Modifier
                         .combinedClickable(
-                            onClick = { drawerViewModel.launchApp(app.packageName) },
+                            onClick = { drawerViewModel.preLaunchApp(app.packageName) },
                             onLongClick = { expandedMenuState[app.packageName] = !isExpanded }
                         )
                         .padding(20.dp),

@@ -27,6 +27,9 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
 
         // Dark-mode settings Key
         val DARK_MODE_KEY = booleanPreferencesKey(("dark_mode"))
+
+        // High-friction mode settings Key
+        val HIGH_FRICTION_KEY = booleanPreferencesKey("high_friction")
     }
 
     val maxDockSize: Flow<Int> = context.dataStore.data.map { preferences ->
@@ -49,6 +52,17 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
         context.dataStore.edit { preferences ->
             val currentValue = preferences[GREYSCALE_ICONS_KEY] ?: false // Current value, default to false
             preferences[GREYSCALE_ICONS_KEY] = !currentValue // store Inverse current value
+        }
+    }
+
+    val isHighFriction: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[HIGH_FRICTION_KEY] ?: false
+    }
+
+    suspend fun toggleHighFriction() {
+        context.dataStore.edit { preferences ->
+            val currentValue = preferences[HIGH_FRICTION_KEY] ?: false // Current value, default to false
+            preferences[HIGH_FRICTION_KEY] = !currentValue // store Inverse current value
         }
     }
 

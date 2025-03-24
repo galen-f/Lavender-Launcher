@@ -30,6 +30,9 @@ class SettingsViewModel @Inject constructor(
     val darkMode: StateFlow<Boolean> = settingsRepository.isDarkModeEnabled
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    val isHighFriction: StateFlow<Boolean> = settingsRepository.isHighFriction
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     // For dark mode, assume you add a similar DataStore key and methods in your repository.
     private val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
 
@@ -42,6 +45,12 @@ class SettingsViewModel @Inject constructor(
     fun toggleGreyScaleApps() {
         viewModelScope.launch {
             settingsRepository.toggleGreyScaleIcons()
+        }
+    }
+
+    fun toggleHighFriction() {
+        viewModelScope.launch {
+            settingsRepository.toggleHighFriction()
         }
     }
 

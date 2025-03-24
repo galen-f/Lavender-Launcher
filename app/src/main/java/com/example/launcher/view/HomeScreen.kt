@@ -60,6 +60,7 @@ fun HomeScreen(
 ) {
     val folders = viewModel.folders.collectAsState().value
     var showInputDialog by remember { mutableStateOf(false) }
+    val pendingApp by viewModel.pendingLaunchApp.collectAsState()
 
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -105,6 +106,25 @@ fun HomeScreen(
                     navController.navigate("appDrawer") // Go to appDrawer
                 }
             }
+    }
+
+    // If a launch is pending, show the confirmation dialog
+    if (pendingApp != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.cancelLaunch() },
+            title = { Text("Confirm App Launch") },
+            text = { Text("Are you sure you want to open this app?") },
+            confirmButton = {
+                TextButton(onClick = { viewModel.confirmLaunch() }) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.cancelLaunch() }) {
+                    Text("No")
+                }
+            }
+        )
     }
 
     Box( // Screen box
