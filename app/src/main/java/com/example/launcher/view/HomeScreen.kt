@@ -180,7 +180,6 @@ fun HomeScreen(
         FolderAddDialog(viewModel, onDismiss = { showInputDialog = false })
     }
 
-    // TODO: This will prompt every time the user opens the app even if they deny it
     if (showPermissionDialog.value) { // Permissions dialog, the screen-time tracker cant work without these permissions
         AlertDialog(
             onDismissRequest = { viewModel.setPermissionDialogState(false) },

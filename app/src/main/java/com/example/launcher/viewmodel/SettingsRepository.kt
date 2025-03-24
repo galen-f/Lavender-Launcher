@@ -30,6 +30,9 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
 
         // High-friction mode settings Key
         val HIGH_FRICTION_KEY = booleanPreferencesKey("high_friction")
+
+        // Check if the user has denied usage permissions
+        val USAGE_PERMISSION_REQUESTED_KEY = booleanPreferencesKey("usage_permissions_requested")
     }
 
     val maxDockSize: Flow<Int> = context.dataStore.data.map { preferences ->
@@ -63,6 +66,16 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
         context.dataStore.edit { preferences ->
             val currentValue = preferences[HIGH_FRICTION_KEY] ?: false // Current value, default to false
             preferences[HIGH_FRICTION_KEY] = !currentValue // store Inverse current value
+        }
+    }
+
+    val isUsagePermissionRequested: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[USAGE_PERMISSION_REQUESTED_KEY] ?: false
+    }
+
+    suspend fun setUsagePermissionRequested(value: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[ USAGE_PERMISSION_REQUESTED_KEY ] = value
         }
     }
 

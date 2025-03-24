@@ -205,16 +205,20 @@ class HomeViewModel @Inject constructor(
     }
 
     // Screen-time Tracker Logic
-
     private fun fetchScreenTime() {
         viewModelScope.launch {
             if (!screentimeManager.hasUsageAccess(context)) {
-                Log.e("HomeViewModel", "Usage access permission is not granted.")
-                _showPermissionDialog.value = true
-                return@launch
+                // Check if we've already asked for permission
+                val hasBeenAsked = settingsRepository.isUsagePermissionRequested.first()
+                if (!hasBeenAsked) {
+                    // Mark prompted and then show the dialog
+                    settingsRepository.setUsagePermissionRequested(true)
+                    _showPermissionDialog.value = true
+                    return@launch
+                }
             }
+            // If permission is granted (or already asked), update screen time
             _screenTime.value = screentimeManager.getTotalScreenTime(context)
-            Log.d("HomeViewModel", "Screen-time queried")
         }
     }
 }
