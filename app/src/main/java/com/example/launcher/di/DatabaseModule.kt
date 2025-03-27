@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.launcher.model.AppDao
 import com.example.launcher.model.AppDatabase
-import com.example.launcher.viewmodel.SettingsRepository
+import com.example.launcher.model.SettingsRepository
 
 import dagger.Module
 import dagger.Provides

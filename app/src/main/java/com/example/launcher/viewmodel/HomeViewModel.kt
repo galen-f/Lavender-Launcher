@@ -12,6 +12,7 @@ import com.example.launcher.model.AppDao
 import com.example.launcher.model.AppEntity
 import com.example.launcher.model.AppFolderEntity
 import com.example.launcher.model.FolderEntity
+import com.example.launcher.model.SettingsRepository
 import com.example.launcher.utils.ScreentimeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

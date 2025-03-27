@@ -1,4 +1,4 @@
-package com.example.launcher.viewmodel
+package com.example.launcher.model
 
 import android.content.Context
 import androidx.datastore.core.DataStore
