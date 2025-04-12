@@ -1,7 +1,10 @@
 package com.example.launcher.model
 
 import android.content.Context
-import androidx.room.*
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.launcher.utils.IntListConverter
 
 @Database(entities = [AppEntity::class, FolderEntity::class, AppFolderEntity::class], version = 5)

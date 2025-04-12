@@ -8,19 +8,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.launcher.ui.theme.LauncherTheme
 import com.example.launcher.view.AppDrawer
 import com.example.launcher.view.HomeScreen
 import com.example.launcher.view.SettingsScreen
-import dagger.hilt.android.AndroidEntryPoint
-
-// Navigation Support Libraries
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.launcher.viewmodel.DrawerViewModel
-import com.example.launcher.viewmodel.SettingsViewModel
 import com.example.launcher.viewmodel.HomeViewModel
+import com.example.launcher.viewmodel.SettingsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint // HILT
 class MainActivity : ComponentActivity() {
