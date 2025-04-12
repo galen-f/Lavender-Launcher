@@ -35,7 +35,6 @@ class SettingsViewModel @Inject constructor(
     val isHighFriction: StateFlow<Boolean> = settingsRepository.isHighFriction
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    // For dark mode, assume you add a similar DataStore key and methods in your repository.
     private val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
 
     fun setMaxDockSize(size: Int) {
